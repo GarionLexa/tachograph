@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>НРД Drive Smart — 100% Клон и Тренажер v6.1</title>
+<style>
+  :root {
+    --bg-main: #0b0e14;
+    --panel-bg: #151922;
+    --card-bg: #1c222e;
+    --border-col: #2a3241;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent-amber: #f59e0b;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --accent-blue: #3b82f6;
+  }
+  * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; max-width: 100vw; overflow-x: hidden;
+    background: var(--bg-main); color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    touch-action: manipulation; line-height: 1.4;
+  }
+  .top-bar {
+    width: 100%; max-width: 1020px; margin: 0 auto; padding: 8px 10px 0;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .brand-badge { font-size: 13px; font-weight: 800; color: #f8fafc; display: flex; align-items: center; gap: 6px; }
+  .lang-btn {
+    background: var(--card-bg); color: #f8fafc; border: 1px solid var(--border-col);
+    border-radius: 6px; padding: 4px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;
+  }
+  .app-layout {
+    width: 100%; max-width: 1020px; margin: 0 auto; padding: 8px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  @media (orientation: landscape) and (min-width: 660px) {
+    .app-layout {
+      display: grid; grid-template-columns: 1.06fr 0.94fr;
+      align-items: start; gap: 12px; padding: 10px;
+    }
+    .full-span { grid-column: 1 / -1; }
+  }
+  .dash-panel {
+    width: 100%; background: linear-gradient(145deg, #262a33 0%, #181b22 55%, #111318 100%);
+    border: 2px solid #090b0e; border-radius: 14px; padding: 10px;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.08);
+    position: relative;
+  }
+  .din-holes {
+    display: flex; justify-content: space-between; pointer-events: none;
+    position: absolute; inset: 6px 6px; z-index: 5;
+  }
+  .din-col { display: flex; flex-direction: column; justify-content: space-between; }
+  .din-hole { width: 6px; height: 6px; border-radius: 50%; background: #050608; border: 1px solid #333942; }
+  .tacho-body {
+    background: linear-gradient(180deg, #1b1e25, #121419);
+    border: 2px solid #08090c; border-radius: 10px; padding: 10px;
+    display: grid; grid-template-columns: 1.62fr 0.78fr; gap: 8px; position: relative;
+  }
+  .lcd-frame {
+    background: #090b0e; padding: 5px; border-radius: 6px;
+    border: 2px solid #242933; margin-bottom: 8px;
+  }
+  .lcd-screen {
+    background: linear-gradient(180deg, #dcf746 0%, #c1e822 55%, #add412 100%);
+    color: #162002; font-family: "Courier New", Courier, monospace; font-weight: 900;
+    font-size: clamp(13px, 3.9vw, 15.5px); line-height: 1.35;
+    padding: 7px 8px; border-radius: 4px; height: 56px;
+    box-shadow: inset 0 0 12px rgba(55,85,0,0.5);
+    display: flex; flex-direction: column; justify-content: space-between;
+    overflow: hidden; transition: background 0.2s, color 0.2s, filter 0.2s; cursor: pointer;
+  }
+  @media (orientation: landscape) and (min-width: 660px) { .lcd-screen { font-size: 15px; } }
+  .lcd-screen.inverted { background: #141a04 !important; color: #d8f832 !important; }
+  .lcd-screen.alert-red {
+    background: linear-gradient(180deg, #ef4444 0%, #dc2626 60%, #b91c1c 100%) !important;
+    color: #ffffff !important; box-shadow: inset 0 0 14px rgba(100,0,0,0.85) !important;
+  }
+  .lcd-screen.sleep-stage1 { background: #1c2214 !important; color: #65774a !important; box-shadow: inset 0 0 18px #000 !important; }
+  .lcd-screen.sleep-stage2 { background: #070806 !important; color: transparent !important; box-shadow: inset 0 0 20px #000 !important; }
+  .lcd-row { white-space: pre; overflow: hidden; width: 100%; letter-spacing: 0.2px; }
+
+  .btn-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 8px; }
+  .t-btn {
+    background: linear-gradient(180deg, #333944 0%, #1d2128 100%);
+    color: #f8fafc; border: 1px solid #08090c; border-bottom: 2px solid #000;
+    border-radius: 6px; height: 38px; font-weight: 800; font-size: 12px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+  .t-btn:active { transform: translateY(1.5px); background: #14171c; }
+  .t-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.3; }
+  .usb-plug { font-size: 8.5px; color: #94a3b8; background: #15181e; flex-direction: column; gap: 1px; border: 1px dashed #334155; }
+  .usb-plug svg { width: 12px; height: 12px; }
+  .slots-row { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+  .card-slot { flex: 1; height: 14px; background: #07080a; border: 1px solid #282c34; border-radius: 3px; position: relative; cursor: pointer; }
+  .card-slot.active::after {
+    content: ''; position: absolute; left: 8%; right: 8%; top: 3px; height: 6px;
+    background: #fbbf24; border-radius: 2px; box-shadow: 0 0 8px #fbbf24;
+  }
+  .card-slot.active.unauth::after { background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: ledPulse 0.6s infinite alternate; }
+  .card-slot.active.ctrl::after { background: #a855f7; box-shadow: 0 0 8px #a855f7; }
+  .card-slot.active.ws::after { background: #10b981; box-shadow: 0 0 8px #10b981; }
+  .card-slot.active.comp::after { background: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+  .slot-btn { width: 30px; height: 26px; font-size: 12px; touch-action: none; }
+  .led-dot { width: 8px; height: 8px; border-radius: 50%; background: #1e293b; border: 1px solid #000; flex-shrink: 0; }
+  .led-dot.blink { background: #ef4444; box-shadow: 0 0 10px #ef4444; animation: ledPulse 0.45s infinite alternate; }
+  @keyframes ledPulse { from { opacity: 1; } to { opacity: 0.2; } }
+  .right-col { display: flex; flex-direction: column; justify-content: space-between; }
+  .printer-box {
+    flex: 1; background: linear-gradient(180deg, #22262e 0%, #13161a 100%);
+    border: 2px solid #090a0d; border-radius: 7px; display: flex; align-items: center;
+    justify-content: space-between; padding: 6px 8px; cursor: pointer; margin-bottom: 8px;
+  }
+  .white-sticker { width: 13px; height: 48px; background: #e2e8f0; border-radius: 2px; flex-shrink: 0; }
+  .nrd-logo { font-size: 18px; font-weight: 900; color: #f8fafc; letter-spacing: 0.8px; }
+  .ex-badge { font-size: 9px; font-weight: 800; color: #94a3b8; border: 1px solid #64748b; padding: 1px 3px; border-radius: 3px; }
+  .assistant-box {
+    background: linear-gradient(135deg, #161d2a 0%, #111621 100%);
+    border: 1px solid #2d384d; border-left: 4px solid var(--accent-blue);
+    border-radius: 10px; padding: 9px 11px; font-size: 12px; color: #dbeafe;
+    display: flex; flex-direction: column; gap: 4px; transition: border-color 0.25s;
+  }
+  .assistant-box.error-explain {
+    background: linear-gradient(135deg, #2a1418 0%, #1c0f12 100%);
+    border-color: #7f1d1d; border-left: 4px solid var(--accent-red); color: #fee2e2;
+  }
+  .assistant-head { font-weight: 800; font-size: 12.5px; display: flex; align-items: center; justify-content: space-between; }
+  .control-card {
+    background: var(--panel-bg); border: 1px solid var(--border-col);
+    border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .slots-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+  @media (max-width: 380px) { .slots-grid { grid-template-columns: 1fr; } }
+  .slot-box {
+    background: #0e1118; border: 1px solid #232936; border-radius: 8px;
+    padding: 7px; display: flex; flex-direction: column; gap: 5px; min-width: 0;
+  }
+  .slot-box-title { font-size: 11px; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between; }
+  .slot-box select {
+    width: 100%; padding: 6px; border-radius: 6px; background: #171c26; color: #f8fafc;
+    border: 1px solid #334155; font-size: 11.5px; font-weight: 600; text-overflow: ellipsis;
+  }
+  .sim-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; width: 100%; }
+  .sim-btn {
+    background: linear-gradient(180deg, #2b3342, #1e2430); color: #f8fafc;
+    border: 1px solid rgba(255,255,255,0.08); padding: 9px 8px; border-radius: 8px;
+    font-weight: 700; font-size: 11.5px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .sim-btn:active { transform: translateY(1px); filter: brightness(0.9); }
+  .sim-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+  .sim-btn.green { background: linear-gradient(180deg, #10b981, #059669); }
+  .sim-btn.amber { background: linear-gradient(180deg, #f59e0b, #d97706); color: #fff; }
+  .sim-btn.red { background: linear-gradient(180deg, #ef4444, #dc2626); }
+  .sim-btn.blue { background: linear-gradient(180deg, #3b82f6, #2563eb); }
+  .time-panel {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--panel-bg); border: 1px solid var(--border-col); border-radius: 12px; padding: 10px;
+  }
+  .dial-container {
+    position: relative; width: 110px; height: 110px; border-radius: 50%; flex-shrink: 0;
+    background: radial-gradient(circle, #141822 0%, #080a0f 100%);
+    border: 3px solid #2e3646; box-shadow: inset 0 0 14px #000; touch-action: none;
+  }
+  .dial-center { position: absolute; top: 50%; left: 50%; width: 12px; height: 12px; background: var(--accent-amber); border-radius: 50%; transform: translate(-50%, -50%); z-index: 2; }
+  .dial-hand { position: absolute; top: 50%; left: 50%; width: 3.5px; height: 42px; background: var(--accent-amber); border-radius: 2px; transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); z-index: 1; }
+  .dial-marker { position: absolute; font-size: 9.5px; color: #64748b; font-weight: 800; }
+  .dial-time-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 13px; font-weight: 900; color: #f8fafc; font-family: monospace; margin-top: 24px; z-index: 3; }
+  .time-controls { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .quick-time-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .q-btn { background: #1e2430; color: #e2e8f0; border: 1px solid #334155; border-radius: 6px; padding: 7px 2px; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .q-btn.accent { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #fbbf24; grid-column: span 2; }
+  .receipt-wrap { width: 100%; display: none; flex-direction: column; align-items: center; gap: 8px; perspective: 1200px; }
+  .receipt-inner { position: relative; width: 100%; max-width: 480px; transition: transform 0.65s; transform-style: preserve-3d; }
+  .receipt-wrap.flipped .receipt-inner { transform: rotateY(180deg); }
+  .paper-front, .paper-back {
+    width: 100%; background: #fdfdfd; color: #111; padding: 12px; border-radius: 4px;
+    border-top: 5px dashed #cbd5e1; border-bottom: 5px dashed #cbd5e1;
+    font-family: "Courier New", monospace; font-size: 11px; line-height: 1.35;
+    backface-visibility: hidden; white-space: pre-wrap; box-shadow: 0 8px 24px rgba(0,0,0,0.65);
+  }
+  .paper-back {
+    position: absolute; top: 0; left: 0; min-height: 100%; transform: rotateY(180deg);
+    background: #fffdf9; white-space: normal; font-family: system-ui, sans-serif; font-size: 11.5px; color: #1e293b;
+  }
+  .manual-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+  .manual-input-row input { width: 100%; padding: 4px 6px; border: 1px solid #94a3b8; border-radius: 4px; font-size: 11.5px; color: #0f172a; background: #fff; }
+  .rto-guide { background: var(--panel-bg); border: 1px solid var(--border-col); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .rto-title { font-size: 13.5px; font-weight: 800; color: #f8fafc; display: flex; align-items: center; gap: 6px; }
+  .rto-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+  .rto-item { background: #0e1118; border: 1px solid #232936; border-radius: 8px; padding: 9px; font-size: 11.8px; line-height: 1.45; color: #cbd5e1; }
+  .rto-badge { display: inline-block; font-family: monospace; font-weight: 900; background: #dcf746; color: #162002; padding: 1px 6px; border-radius: 4px; margin-right: 5px; font-size: 12px; }
+  .law-links { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 4px; }
+  .law-link {
+    background: #172030; color: #60a5fa; border: 1px solid #2b3b54;
+    padding: 5px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; text-decoration: none;
+  }
+  .law-link:hover { background: #1e293b; }
+</style>
+</head>
+
+<body>
+<div class="top-bar">
+  <div class="brand-badge">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h4m-4 4h8"/></svg>
+    <span>НРД Drive Smart (РЭ v6.1)</span>
+  </div>
+  <button class="lang-btn" id="langSwitchBtn" onclick="toggleLanguage()">🌐 Язык: RU / EN</button>
+</div>
+
+<div class="app-layout">
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div class="dash-panel">
+      <div class="din-holes">
+        <div class="din-col"><div class="din-hole"></div><div class="din-hole"></div></div>
+        <div class="din-col"><div class="din-hole"></div><div class="din-hole"></div></div>
+      </div>
+      <div class="tacho-body">
+        <div class="left-col">
+          <div class="lcd-frame">
+            <div class="lcd-screen" id="lcdScreen" onclick="onLcdClick()">
+              <div class="lcd-row" id="row1"></div>
+              <div class="lcd-row" id="row2"></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="t-btn" onclick="btnPress('back')" title="Назад / Отмена">
+              <svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>
+            </button>
+            <button class="t-btn" onclick="btnPress('up')" title="Вверх">
+              <svg viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>
+            </button>
+            <button class="t-btn" onclick="btnPress('down')" title="Вниз">
+              <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <button class="t-btn" onclick="btnPress('ok')" title="Подтвердить (OK)">OK</button>
+            <div class="t-btn usb-plug" onclick="quickUsbExport()" title="USB-разъем выгрузки">
+              <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              <span>USB</span>
+            </div>
+          </div>
+          <div class="slots-row">
+            <div class="card-slot" id="slot1" onclick="explainSlot(1)" title="Слот 1 (Основной водитель)"></div>
+            <button class="t-btn slot-btn" id="btnSlot1" onpointerdown="startHold(1)" onpointerup="endHold(1)" onpointerleave="cancelHold(1)">1</button>
+            <div class="led-dot" id="ledIndicator" title="Светодиод событий"></div>
+            <button class="t-btn slot-btn" id="btnSlot2" onpointerdown="startHold(2)" onpointerup="endHold(2)" onpointerleave="cancelHold(2)">2</button>
+          </div>
+        </div>
+        <div class="right-col">
+          <div class="printer-box" onclick="quickPrintMenu()" title="Отсек термопринтера (нажмите для печати)">
+            <div class="white-sticker" title="Пломба"></div>
+            <div class="nrd-logo">НРД</div>
+            <div class="ex-badge">Ex</div>
+          </div>
+          <div class="slots-row">
+            <div class="card-slot" id="slot2" onclick="explainSlot(2)" title="Слот 2 (Сменный водитель)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ЖИВОЙ ИНСТРУКТОР И ОБЪЯСНЕНИЕ ОШИБОК -->
+    <div class="assistant-box" id="assistantBox">
+      <div class="assistant-head">
+        <span id="assistTitle">💡 Подсказка по работе с тахографом</span>
+        <span style="font-size:10.5px; opacity:0.8;" id="assistScreenTag">Экран 1/7</span>
+      </div>
+      <div id="assistBody">Перед началом движения вставьте карту водителя в <b>Слот 1</b> и введите ПИН-код <b>1234</b> (кнопками ▲/▼ и OK). Короткое нажатие кнопки <b>«1»</b> меняет режим (h / ⚒ / ☒), удержание 2 сек — извлекает карту.</div>
+    </div>
+
+    <!-- ЧАСЫ С ПЕРЕМОТКОЙ ВПЕРЕД И НАЗАД -->
+    <div class="time-panel">
+      <div class="dial-container" id="dial">
+        <div class="dial-marker" style="top: 3px; left: 50%; transform: translateX(-50%);">00</div>
+        <div class="dial-marker" style="right: 4px; top: 50%; transform: translateY(-50%);">06</div>
+        <div class="dial-marker" style="bottom: 3px; left: 50%; transform: translateX(-50%);">12</div>
+        <div class="dial-marker" style="left: 4px; top: 50%; transform: translateY(-50%);">18</div>
+        <div class="dial-hand" id="dialHand"></div>
+        <div class="dial-center"></div>
+        <div class="dial-time-display" id="dialTime">14:28</div>
+      </div>
+      <div class="time-controls">
+        <div style="font-size:12px; font-weight:800; color:#f8fafc;">Перемотка времени (вперёд / назад):</div>
+        <div class="quick-time-btns">
+          <button class="q-btn" onclick="shiftTime(-60)">−1 ч</button>
+          <button class="q-btn" onclick="shiftTime(-15)">−15 м</button>
+          <button class="q-btn" onclick="shiftTime(15)">+15 м</button>
+          <button class="q-btn" onclick="shiftTime(60)">+1 ч</button>
+          <button class="q-btn accent" onclick="shiftTime(45)">+45м (Отдых)</button>
+          <button class="q-btn accent" onclick="shiftTime(270)">+4ч 30м (Лимит)</button>
+        </div>
+        <div style="font-size:10.5px; color:var(--text-muted);">
+          Пробег и время в чеке на 100% синхронизированы с одометром тахографа.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ПРАВАЯ КОЛОНКА: КАРТЫ И СИМУЛЯЦИЯ -->
+  <div class="control-card">
+    <div class="slots-grid">
+      <div class="slot-box">
+        <div class="slot-box-title"><span>СЛОТ 1 (ЛЕВЫЙ)</span><span>ПИН: 1234</span></div>
+        <select id="selSlot1">
+          <option value="driver1">Водитель: Гарион А.Ю.</option>
+          <option value="driver2">Водитель: Белобородов А.</option>
+          <option value="company">Предприятие: Лента</option>
+          <option value="controller">Контролер: Ространснадзор</option>
+          <option value="workshop">Мастерская: ИП Сизенок</option>
+        </select>
+        <button class="sim-btn amber" id="card1Btn" onclick="toggleSlotCard(1)">
+          <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <span id="card1BtnTxt">Вставить в Слот 1</span>
+        </button>
+      </div>
+      <div class="slot-box">
+        <div class="slot-box-title"><span>СЛОТ 2 (ПРАВЫЙ)</span><span>ПИН: 1234</span></div>
+        <select id="selSlot2">
+          <option value="driver2">Водитель: Белобородов А.</option>
+          <option value="driver1">Водитель: Гарион А.Ю.</option>
+          <option value="company">Предприятие: Лента</option>
+          <option value="controller">Контролер: Ространснадзор</option>
+          <option value="workshop">Мастерская: ИП Сизенок</option>
+        </select>
+        <button class="sim-btn amber" id="card2Btn" onclick="toggleSlotCard(2)">
+          <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <span id="card2BtnTxt">Вставить в Слот 2</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="sim-grid">
+      <button class="sim-btn green" id="driveBtn" onclick="toggleDrive()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v7m-7 4l6-2m8 2l-6-2"/></svg>
+        <span id="driveBtnTxt">Начать движение</span>
+      </button>
+      <button class="sim-btn blue" id="ignBtn" onclick="toggleIgnition()">
+        <svg viewBox="0 0 24 24"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/></svg>
+        <span id="ignBtnTxt">Зажигание: ВКЛ</span>
+      </button>
+      <button class="sim-btn" onclick="swapDriverCards()">
+        <svg viewBox="0 0 24 24"><path d="M17 2.1l4 4-4 4"/><path d="M3 12.2v-2a4 4 0 0 1 4-4h14"/><path d="M7 21.9l-4-4 4-4"/><path d="M21 11.8v2a4 4 0 0 1-4 4H3"/></svg>
+        <span>Смена карт (1 ↔ 2)</span>
+      </button>
+      <button class="sim-btn" onclick="triggerSpeeding()">
+        <svg viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+        <span>Превышение (>90)</span>
+      </button>
+      <button class="sim-btn" onclick="togglePaper(this)">
+        <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        <span>Бумага: ЕСТЬ</span>
+      </button>
+      <button class="sim-btn red" onclick="simulateMalfunction()">
+        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Сбой / Ошибка</span>
+      </button>
+      <button class="sim-btn" onclick="quickPrintMenu()">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        <span>Печать суточн. чека</span>
+      </button>
+      <button class="sim-btn" onclick="resetAllFaults()">
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        <span>Сбросить ошибки</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- БЛОК ЧЕКА С ПЕРЕВОРОТОМ И ИНТЕРАКТИВНЫМ БЛАНКОМ РУЧНОГО ВВОДА (п. 11.1.8) -->
+  <div class="receipt-wrap full-span" id="receiptArea">
+    <div style="display:flex; gap:8px; width:100%; max-width:480px;">
+      <button class="sim-btn blue" style="flex:1;" onclick="flipReceipt()" id="flipBtn">🔄 Перевернуть чек (Заполнить бланк вручную)</button>
+      <button class="sim-btn red" style="width:110px;" onclick="closeReceipt()">✖ Закрыть</button>
+    </div>
+    <div class="receipt-inner" id="receiptInner">
+      <div class="paper-front" id="paperText" onclick="explainReceiptFront()"></div>
+      <div class="paper-back" id="paperBack"></div>
+    </div>
+  </div>
+
+  <!-- ПАМЯТКА ПО РТО И ССЫЛКИ НА ЗАКОНЫ РФ -->
+  <div class="rto-guide full-span">
+    <div class="rto-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Режимы труда и отдыха водителей (РТО) и законодательная база РФ</span>
+    </div>
+    <div class="rto-cards">
+      <div class="rto-item">
+        <div><span class="rto-badge">◉</span><b>Управление (Не более 4ч 30м)</b></div>
+        Включается автоматически при движении. После <b>4 часов 30 минут</b> управления водитель обязан сделать перерыв минимум на <b>45 минут</b> (либо разделить его: сначала <b>≥15 мин</b>, затем <b>≥30 мин</b>). Суточный лимит вождения — <b>9 часов</b> (допускается до 10 часов не более 2 раз в неделю).
+      </div>
+      <div class="rto-item">
+        <div><span class="rto-badge">h</span><b>Отдых и ежедневный перерыв</b></div>
+        Включается кнопкой <b>«1»</b> на стоянке или при выключении зажигания. Ежедневный (межсменный) отдых должен составлять не менее <b>11 часов</b> подряд (допускается сокращение до 9 часов не более 3 раз в неделю).
+      </div>
+      <div class="rto-item">
+        <div><span class="rto-badge">⚒</span><b>Прочие работы (Не гасят паузу!)</b></div>
+        Устанавливается автоматически при остановке ТС (погрузка, разгрузка, ремонт, прогрев). Внимание: режим «Молотки» <b>не засчитывается в перерыв от вождения</b>! Встал на отдых — переключи кнопкой «1» на <b>h</b>.
+      </div>
+      <div class="rto-item">
+        <div><span class="rto-badge">☒</span><b>Готовность и бланк на обороте чека</b></div>
+        Ожидание погрузки/парома или место второго водителя в экипаже. Если тахограф или карта сломались в рейсе (п. 11.1.8 РЭ), водитель обязан вручную чертить график своих режимов на <b>обратной стороне чековой ленты</b> и заверять подписью.
+      </div>
+    </div>
+    <div class="law-links">
+      <a class="law-link" href="https://normativ.kontur.ru/document?moduleId=1&documentId=441391" target="_blank" rel="noopener">📜 ПДД РФ Раздел 26 (Нормы времени управления и отдыха)</a>
+      <a class="law-link" href="https://normativ.kontur.ru/document?moduleId=1&documentId=374709" target="_blank" rel="noopener">📜 Приказ Минтранса РФ № 424 (Особенности РТО водителей)</a>
+      <a class="law-link" href="https://normativ.kontur.ru/document?moduleId=1&documentId=377052" target="_blank" rel="noopener">📜 Приказ Минтранса РФ № 440 (Правила работы с тахографами СКЗИ)</a>
+      <a class="law-link" href="https://www.consultant.ru/document/cons_doc_LAW_34661/48947316422460b10d02a749f8f470c748b8c9d7/" target="_blank" rel="noopener">⚖️ КоАП РФ ст. 11.23 (Штрафы за отсутствие карты и нарушение РТО)</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const symbols = ['h', '⚒', '☒', '◉', '?'];
+const modeNamesRu = ['Отдых', 'Работа', 'Готовн.', 'Управл.', 'Нет дан'];
+const modeNamesEn = ['Rest', 'Work', 'Avail.', 'Driving', 'Unknown'];
+
+const errorCodes = {
+  '01': 'Карта недействит', '02': 'Конфликт карт', '03': 'Нестыковка врем.',
+  '04': 'Без соотв. карты', '05': 'Ввод на ходу', '06': 'Сбой посл.сеанса',
+  '07': 'Превыш. скорости', '08': 'Прекращ. питания', '10': 'Конфликт движен.',
+  '16': 'НКМ не функцион.', '23': 'Вскрытие корпуса', '50': 'Ошибка принтера',
+  '51': 'Неиспр. дисплея', '53': 'Неиспр. датчика', '56': 'Ошибка пам. SRAM',
+  '129': 'Запрещено в движ', '132': 'Сбой связи СКЗИ',
+  'RTO15': 'До паузы 15 мин', 'RTO00': 'Лимит вождения!'
+};
+
+// Подробная база объяснений: почему возникла ошибка и как её избежать (по разделу 17 Руководства)
+const errorExplanations = {
+  '01': {
+    why: 'Установлена недействительная карта (истек срок, карта от ЕСТР вместо СКЗИ или 3 раза неверно введен ПИН/PUK).',
+    fix: 'Проверьте срок действия карты СКЗИ и используйте конверт с ПИН/PUK-кодом. При блокировке введите PUK (12345678).'
+  },
+  '02': {
+    why: 'В оба слота тахографа одновременно вставлены несовместимые спецкарты (например, карта Контролера и Мастерской).',
+    fix: 'Извлеките одну из конфликтующих карт удержанием кнопки «1» или «2» (см. таблицу совместимости в разделе 9 РЭ).'
+  },
+  '04': {
+    why: 'Начато движение автомобиля без установленной в Слот 1 карты водителя либо без введенного ПИН-кода (1234)!',
+    fix: 'Немедленно остановите ТС, вставьте карту водителя в левый Слот 1 и введите ПИН-код 1234. Движение без карты влечет штраф по ч.1 ст. 11.23 КоАП РФ (от 3000 до 5000 руб.).'
+  },
+  '05': {
+    why: 'Карта водителя была вставлена в слот во время движения транспортного средства.',
+    fix: 'Устанавливайте и извлекайте карту только при полной остановке ТС. Событие уже записано в память карты.'
+  },
+  '06': {
+    why: 'При прошлом извлечении карты запись данных завершилась некорректно (загрязнен чип или карту выдернули силой).',
+    fix: 'Протрите чип карты салфеткой и всегда дожидайтесь завершения записи и выбора «Место конца: RUS» перед выниманием.'
+  },
+  '07': {
+    why: 'Скорость движения ТС превысила установленный лимит (90 км/ч) более чем на 60 секунд.',
+    fix: 'Снизьте скорость движения ниже 90 км/ч. После остановки сбросьте сообщение кнопкой OK.'
+  },
+  '08': {
+    why: 'Отключалось питание тахографа (отсоединение клемм АКБ при ремонте или обрыв в цепи питания).',
+    fix: 'Подтвердите сообщение кнопкой OK. Если появляется на ходу — проверьте разъем питания A (ABCD) тахографа.'
+  },
+  '10': {
+    why: 'Показания импульсного датчика скорости (ДС) на КПП расходятся со скоростью по спутникам ГНСС (ГЛОНАСС/GPS).',
+    fix: 'Возникает при экранировании сигнала ГНСС либо неисправности датчика скорости / проводки. При повторении обратитесь в АГМ.'
+  },
+  '16': {
+    why: 'Нарушена работа криптографического блока НКМ (СКЗИ) или истек его 3-летний срок эксплуатации.',
+    fix: 'Эксплуатация с нерабочим СКЗИ запрещена. Обратитесь в мастерскую для замены блока НКМ.'
+  },
+  '23': {
+    why: 'Сработал датчик несанкционированного вскрытия корпуса тахографа.',
+    fix: 'Самостоятельное вскрытие корпуса запрещено законом! Требуется проверка пломб в авторизованной мастерской.'
+  },
+  '50': {
+    why: 'Невозможна печать отчета: в лотке термопринтера закончилась бумага или открыта крышка.',
+    fix: 'Установите новый рулон сертифицированной термобумаги (кнопка «Бумага: ЕСТЬ») и плотно защелкните крышку.'
+  },
+  '129': {
+    why: 'Попытка войти в главное меню, распечатать чек, выгрузить данные или извлечь карту во время движения автомобиля.',
+    fix: 'В целях безопасности любые операции с меню, печатью и извлечением карт выполняются только на неподвижном ТС!'
+  },
+  'RTO15': {
+    why: 'Вы за рулем уже 4 часа 15 минут! До истечения максимального лимита непрерывного управления (4ч 30м) осталось 15 минут.',
+    fix: 'Заранее выберите безопасную стоянку, остановите ТС и переключите кнопкой «1» режим на h (Отдых) минимум на 45 минут.'
+  },
+  'RTO00': {
+    why: 'Превышен лимит непрерывного вождения 4 часа 30 минут без 45-минутного перерыва (нарушение п. 26 ПДД РФ / Приказа № 424)!',
+    fix: 'Немедленно остановите ТС на парковке и включите режим h (Отдых) не менее чем на 45 минут для обнуления счетчика вождения.'
+  }
+};
+
+const cardProfiles = {
+  driver1: {
+    type: 'driver', greet: 'Гарион А.Ю.', fullName: 'Гарион Алексей Юрьевич',
+    cardNum: 'RUS/RUD0000482910421 0 0', expiry: '13.09.2027',
+    lastUsed: '12.11.26 19:39', daysSinceExport: 12,
+    pin: '1234', puk: '12345678', pinAttempts: 0, blocked: false
+  },
+  driver2: {
+    type: 'driver', greet: 'Белобородов', fullName: 'Белобородов Александр',
+    cardNum: 'RUS/RUD0000519283741 0 0', expiry: '24.10.2027',
+    lastUsed: '12.11.26 18:15', daysSinceExport: 29,
+    pin: '1234', puk: '12345678', pinAttempts: 0, blocked: false
+  },
+  company: {
+    type: 'company', greet: 'ООО ЛЕНТА', fullName: 'ООО "ЛЕНТА" Логистика',
+    cardNum: 'RUS/RUP00000000204 0 1', expiry: '15.05.2028',
+    lastUsed: '10.11.26 10:00', daysSinceExport: 5,
+    pin: '1234', puk: '12345678', pinAttempts: 0, blocked: false
+  },
+  controller: {
+    type: 'controller', greet: 'КОНТРОЛЕР', fullName: 'Инспектор Ространснадзора',
+    cardNum: 'RUS/RUKGAI00000300 0 0', expiry: '01.12.2027',
+    lastUsed: '12.11.26 11:20', daysSinceExport: 1,
+    pin: '1234', puk: '12345678', pinAttempts: 0, blocked: false
+  },
+  workshop: {
+    type: 'workshop', greet: 'МАСТЕРСКАЯ', fullName: 'ИП "Сизенок Иван Евгеньевич"',
+    cardNum: 'RUS/RUM00000000001 1 1', expiry: '25.07.2027',
+    lastUsed: '01.11.26 09:00', daysSinceExport: 2,
+    pin: '1234', puk: '12345678', pinAttempts: 0, blocked: false
+  }
+};
+
+const backlightColors = [
+  'linear-gradient(180deg, #dcf746 0%, #c1e822 55%, #add412 100%)',
+  'linear-gradient(180deg, #bbf7d0 0%, #4ade80 55%, #22c55e 100%)',
+  'linear-gradient(180deg, #bae6fd 0%, #38bdf8 55%, #0284c7 100%)',
+  'linear-gradient(180deg, #fde68a 0%, #fbbf24 55%, #d97706 100%)',
+  'linear-gradient(180deg, #e9d5ff 0%, #c084fc 55%, #9333ea 100%)',
+  'linear-gradient(180deg, #fecdd3 0%, #fb7185 55%, #e11d48 100%)',
+  'linear-gradient(180deg, #f3f4f6 0%, #d1d5db 55%, #9ca3af 100%)'
+];
+
+const state = {
+  lang: 'ru', // 'ru' | 'en'
+  activated: true, ignition: true, driving: false,
+  slot1Key: null, slot2Key: null,
+  slot1Auth: false, slot2Auth: false,
+  activeAuthSlot: 1, pinVal: 1, pinInput: '', pinStage: 'digits',
+  pukYes: true, pukInput: '',
+  mode1: 0, mode2: 2, dur1: 0, dur2: 0,
+  driveCont1: 0, breakSum1: 0, shiftDrive1: 120, week1Drive1: 840, week2Drive1: 1320,
+  driveCont2: 0, breakSum2: 180, shiftDrive2: 90, week2Drive2: 640,
+  workSum1: 45, restSum1: 480, unknownSum1: 0,
+  clock: 14 * 60 + 28, seconds: 10, tz: 5,
+  dateStr: '13/11', yearStr: '2026', fullDate: '13.11.2026',
+  startOdo: 284485.0, odo: 284650.0, currentSpeed: 0, speedLimit: 90,
+  uiMode: 'main', screenIdx: 0, menuIdx: 0, subIdx: 0,
+  modeSelectSlot: 1, modeSelectTimer: null, holdSlot: null, holdStartTime: 0, holdTimer: null, ejectSlot: 1,
+  manualYes: true, manualUtc: false, manualEndStr: '13/11 08:00', manualAct: 0,
+  reportPending: { type: 'card_daily', step: 0, slot: 1, date: '2026.11.13', utc: true, out: 0 },
+  usbExportType: 0,
+  brightness: 8, colorIdx: 0, dimOnDrive: false, inverted: false, contrast: 4,
+  soundTone: 1, autoRest: true, exMode: false, dataLocked: false,
+  isFerry: false, isOut: false, hasPaper: true, maxDriveTime: 270,
+  alertActive: false, alertLatched: false, alertLine1: '', alertLine2: '',
+  alertBeepInterval: null, alertTimeout: null,
+  preWarnShown: false, limitWarnShown: false, noCardWarnShown: false,
+  sleepStage: 0, sleepTimer1: null, sleepTimer2: null, keyTestIdx: 0,
+  workshopData: {
+    vin: 'XTC549010N0000196', plate: 'RUS/А777АА196',
+    wFactor: 8000, kFactor: 8000, tire: '315/80R22.5', lWheel: 3120,
+    nkmNum: '23L3S00000009941', nkmExpiry: '25.07.2028',
+    serial: '1A2B3C4B032402F3', fw: 'v.1.03.7999', metroFw: 'V1.13.53'
+  },
+  // Реальный хронологический журнал за сутки для 100% совпадения чека с тахографом
+  dailyLog: [
+    { start: '00:00', mode: 0, mins: 480 },
+    { start: '08:00', mode: 1, mins: 45 },
+    { start: '08:45', mode: 3, mins: 120 },
+    { start: '10:45', mode: 0, mins: 45 }
+  ],
+  // 24 часа для ручного графика на обратной стороне чека (0: ◉, 1: ⚒, 2: ☒, 3: h)
+  manualGraphHours: [3,3,3,3,3,3,3,3, 1,0,0,0, 3,3,0,0, 0,1,3,3, 3,3,3,3],
+  eventLog: [
+    { date: '12.11.2026', time: '14:12', code: '04', dur: '00ч03', msg: 'Управление без соотв. карты' },
+    { date: '11.11.2026', time: '09:40', code: '08', dur: '00ч15', msg: 'Прекращение питания' }
+  ]
+};
+
+function getModeNames() { return state.lang === 'en' ? modeNamesEn : modeNamesRu; }
+
+function toggleLanguage() {
+  state.lang = state.lang === 'ru' ? 'en' : 'ru';
+  document.getElementById('langSwitchBtn').textContent = state.lang === 'ru' ? '🌐 Язык: RU' : '🌐 Lang: EN';
+  setHint(
+    state.lang === 'ru' ? '🌐 Язык интерфейса изменен на Русский' : '🌐 Interface language switched to English',
+    state.lang === 'ru' ? 'Все экраны тахографа и пункты главного меню теперь отображаются на русском языке.' : 'All tachograph screens and menu items are now displayed in English.'
+  );
+  render();
+}
+
+function getSlotType(slot) {
+  const k = slot === 1 ? state.slot1Key : state.slot2Key;
+  const auth = slot === 1 ? state.slot1Auth : state.slot2Auth;
+  return (k && auth) ? cardProfiles[k].type : null;
+}
+
+function getOperatingMode() {
+  if (!state.activated) return { mode: 'factory', icon: '🏭', label: state.lang === 'en' ? 'Not activ.' : 'Не активир.' };
+  const s1 = getSlotType(1), s2 = getSlotType(2);
+  if (!s1 && !s2) return { mode: 'work', icon: '•', label: state.lang === 'en' ? 'Operational' : 'Рабочий' };
+  if (s1 && s2 && s1 !== 'driver' && s2 !== 'driver' && s1 !== s2) {
+    return { mode: 'work', icon: '•', label: 'Рабочий', conflict: true };
+  }
+  const activeType = (s1 && s1 !== 'driver') ? s1 : ((s2 && s2 !== 'driver') ? s2 : 'driver');
+  if (activeType === 'controller') return { mode: 'control', icon: 'П', label: state.lang === 'en' ? 'Control' : 'Контроль' };
+  if (activeType === 'workshop') return { mode: 'workshop', icon: '⚒', label: state.lang === 'en' ? 'Workshop' : 'Мастерская' };
+  if (activeType === 'company') return { mode: 'company', icon: 'Т', label: state.lang === 'en' ? 'Company' : 'Предприятие' };
+  return { mode: 'work', icon: '•', label: state.lang === 'en' ? 'Operational' : 'Рабочий' };
+}
+
+function getMenu() {
+  const op = getOperatingMode().mode;
+  const isEntOrWs = (op === 'company' || op === 'workshop');
+  const en = state.lang === 'en';
+  const menu = [
+    {
+      title: en ? '▼/▯ Reports' : '▼/▯ Отчеты',
+      items: [
+        { name: en ? 'Daily card' : 'Суточн. карта', act: () => startReportWizard('card_daily') },
+        { name: en ? 'Daily vehicle' : 'Суточн.тахограф', act: () => startReportWizard('v_daily') },
+        { name: en ? 'Events card' : 'События карта', act: () => startReportWizard('events_card') },
+        { name: en ? 'Events vehicle' : 'События тахогр.', act: () => startReportWizard('events_v') },
+        { name: en ? 'Technical data' : 'Технич. данные', act: () => startReportWizard('tech') },
+        { name: en ? 'Overspeeding' : 'Превыш. скор.', act: () => startReportWizard('speed_over') },
+        { name: en ? 'Vehicle speed' : 'Скорость ТС', act: () => startReportWizard('speed_graph') },
+        { name: en ? 'USB Download' : 'Выгрузка на USB', act: () => openParamEdit('usb_menu') }
+      ]
+    },
+    {
+      title: en ? '• Places' : '• Местополож.',
+      items: [
+        { name: state.isOut ? (en ? '+OUT End' : '+OUT Завершение') : (en ? 'OUT+ Begin' : 'OUT+ Начало'), act: () => toggleOutMode() },
+        { name: en ? '⛴ Ferry/Train' : '⛴ Паром/Поезд', act: () => setFerryMode() }
+      ]
+    },
+    {
+      title: en ? '↘ Settings' : '↘ Параметры',
+      items: [
+        { name: en ? 'Language / Язык' : 'Язык / Language', act: () => toggleLanguage() },
+        { name: en ? 'Brightness' : 'Яркость дисплея', act: () => openParamEdit('brightness') },
+        { name: en ? 'Backlight color' : 'Цвет дисплея', act: () => openParamEdit('color') },
+        { name: en ? 'Dim on drive' : 'Управл. подсв.', act: () => openParamEdit('dim') },
+        { name: en ? 'Invert display' : 'Инверсия диспл.', act: () => openParamEdit('invert') },
+        { name: en ? 'Contrast' : 'Контраст диспл.', act: () => openParamEdit('contrast') },
+        { name: en ? 'Beeper sound' : 'Звук динамика', act: () => openParamEdit('sound') },
+        { name: en ? 'Reset trip odo' : 'Сброс пробега', act: () => resetDailyOdo() },
+        { name: en ? 'Local time' : 'Местное время', act: () => openParamEdit('local_time') },
+        { name: en ? 'UTC time ±1min' : 'Время UTC ±1мин', act: () => openParamEdit('utc_corr') },
+        { name: en ? 'Preflight test' : 'Предрейс. тест', act: () => runSpecificTest('preflight') },
+        { name: en ? 'Test: Display' : 'Тест: Дисплей', act: () => runSpecificTest('display') },
+        { name: en ? 'Test: Printer' : 'Тест: Принтер', act: () => runSpecificTest('printer') },
+        { name: en ? 'Test: Slots' : 'Тест: Картоводы', act: () => runSpecificTest('slots') },
+        { name: en ? 'Test: Keyboard' : 'Тест: Клавиатура', act: () => runSpecificTest('keys') },
+        { name: en ? 'Test: NKM SKZI' : 'Тест: Блок НКМ', act: () => runSpecificTest('nkm') }
+      ]
+    },
+    {
+      title: en ? '🔒 Data Lock' : '🔒 Блокировка',
+      items: [
+        { name: state.dataLocked ? (en ? 'Unlock data?' : 'Разблокировать?') : (en ? 'Lock data?' : 'Блокировать?'), act: () => openParamEdit('lock') },
+        { name: en ? 'Lock status' : 'Статус блокир.', act: () => showSimpleInfo('Блокировок: ' + (state.dataLocked ? '1/20' : '0/20'), state.dataLocked ? 'ЗАБЛОКИРОВАНО' : 'ОТКРЫТО') }
+      ]
+    },
+    {
+      title: en ? 'ℹ Information' : 'ℹ Информация',
+      items: [
+        { name: en ? 'Metrology FW' : 'Метролог. ПО', act: () => showSimpleInfo('Метролог. ПО:', state.workshopData.metroFw) },
+        { name: en ? 'Firmware ver.' : 'Версия микропр.', act: () => showSimpleInfo('Версия ПО БУ:', state.workshopData.fw) },
+        { name: en ? 'GSM Module' : 'GSM Модуль', act: () => showSimpleInfo('MegaFon -54dBm', '860000000000000') },
+        { name: en ? 'SKZI Expiry' : 'Срок блока СКЗИ', act: () => showSimpleInfo('Замена НКМ:', state.workshopData.nkmExpiry) }
+      ]
+    }
+  ];
+  if (isEntOrWs) {
+    menu[2].items.push(
+      { name: 'Учет: Авт.отдых', act: () => openParamEdit('auto_rest') },
+      { name: 'Взрывобезопасн.', act: () => openParamEdit('ex_mode') }
+    );
+  }
+  if (op === 'workshop') {
+    menu.push({
+      title: '⚒ Мастерская',
+      items: [
+        { name: 'Одометр ТС (км)', act: () => openParamEdit('ws_odo') },
+        { name: 'Коэфф. W имп/км', act: () => openParamEdit('ws_w') },
+        { name: 'Лимит скор. >>', act: () => openParamEdit('ws_speed') },
+        { name: 'Активация БУ', act: () => openParamEdit('ws_act') }
+      ]
+    });
+  }
+  return menu;
+}
+
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+function vibrate(ms = 15) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+function beep(freq = 1850, dur = 0.04) {
+  if (state.soundTone === 0) return;
+  const toneShift = state.soundTone === 1 ? 1 : (state.soundTone === 2 ? 0.82 : 1.18);
+  try {
+    initAudio();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.frequency.value = freq * toneShift;
+    g.gain.value = 0.06;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+
+function fDur(m) {
+  const val = Math.max(0, Math.floor(Number(m) || 0));
+  const h = state.lang === 'en' ? 'h' : 'ч';
+  return String(Math.floor(val / 60) % 100).padStart(2, '0') + h + String(val % 60).padStart(2, '0');
+}
+function fClk(m) {
+  const n = ((Math.floor(m) % 1440) + 1440) % 1440;
+  return String(Math.floor(n / 60)).padStart(2, '0') + ':' + String(n % 60).padStart(2, '0');
+}
+function lcdFit(str) {
+  const s = String(str || '');
+  return s.length > 16 ? s.slice(0, 16) : s.padEnd(16, ' ');
+}
+
+function setHint(title, body, isError = false, tag = '') {
+  const box = document.getElementById('assistantBox');
+  box.className = 'assistant-box' + (isError ? ' error-explain' : '');
+  document.getElementById('assistTitle').innerHTML = title;
+  document.getElementById('assistBody').innerHTML = body;
+  if (tag) document.getElementById('assistScreenTag').textContent = tag;
+}
+
+const screenHints = [
+  '<b>Экран 1/7 (Основной):</b> Слева — режим Водителя 1 и его длительность; справа вверху <b>◉‖</b> — сколько осталось ехать до обязательной паузы 45 мин; внизу — местное время и символ режима (• Рабочий).',
+  '<b>Экран 2/7 (Контроль отдыха):</b> Справа вверху <b>‖</b> показана сумма накопленных перерывов (отдых h + готовность ☒). Как только наберется 45 минут, счетчик вождения обнулится.',
+  '<b>Экран 3/7 (Счетчики Водителя 1):</b> Вверху слева — непрерывное вождение (до 04ч30); внизу слева <b>◉►</b> — вождение за смену; справа — вождение за 1 и 2 недели.',
+  '<b>Экран 4/7 (Счетчики Водителя 2):</b> Показатели второго водителя (при езде в экипаже): время управления и накопленное время дежурства/отдыха.',
+  '<b>Экран 5/7 (Дата и Время):</b> Верхняя строка — местное время (с точкой •) и дата; нижняя строка — точное время UTC(SU) с секундами и год.',
+  '<b>Экран 6/7 (Скорость и Одометр):</b> Текущая скорость ТС и общий пробег одометра с точностью до 0.1 км. Этот же пробег печатается в суточном чеке!',
+  '<b>Экран 7/7 (Данные ГНСС ГЛОНАСС/GPS):</b> Текущие координаты (северная широта / восточная долгота) и скорость по спутникам блока НКМ.'
+];
+
+function updateScreenHint() {
+  if (state.alertActive) return;
+  if (state.uiMode === 'main') {
+    setHint('💡 Помощник по текущему экрану', screenHints[state.screenIdx], false, `Экран ${state.screenIdx + 1}/7`);
+  }
+}
+
+function onLcdClick() {
+  wakeUp();
+  if (state.alertActive) {
+    setHint('⚠️ Активно предупреждение на экране', 'Нажмите любую кнопку тахографа, чтобы приглушить звуковой зуммер, а затем нажмите <b>OK</b> для сброса сообщения.', true, 'Тревога');
+  } else {
+    updateScreenHint();
+  }
+}
+
+function explainSlot(slot) {
+  const k = slot === 1 ? state.slot1Key : state.slot2Key;
+  const auth = slot === 1 ? state.slot1Auth : state.slot2Auth;
+  if (!k) {
+    setHint(`💳 Картовод №${slot} пуст`, `Выберите нужную карту в списке «Слот ${slot}» и нажмите «Вставить». Короткое нажатие на кнопку «${slot}» меняет вид деятельности, удержание 2 сек — извлекает карту.`, false, `Слот ${slot}`);
+  } else if (!auth) {
+    setHint(`🔒 Карта в Слоте ${slot} ждет ввода ПИН-кода!`, `Карта вставлена, но еще не аутентифицирована (горит красный индикатор). Введите ПИН-код <b>1234</b> кнопками ▲ / ▼ и подтвердите кнопкой <b>OK</b>.`, true, `Слот ${slot}`);
+  } else {
+    const c = cardProfiles[k];
+    setHint(`✅ В Слоте ${slot} активна карта: ${c.fullName}`, `Номер: <b>${c.cardNum}</b> (действительна до ${c.expiry}). Чтобы извлечь карту в конце смены, удерживайте кнопку <b>«${slot}»</b> в течение 2 секунд.`, false, `Слот ${slot}`);
+  }
+}
+
+function triggerAlert(line1, line2, code = null, autoClearMs = 0) {
+  wakeUp(false);
+  state.alertActive = true;
+  state.alertLatched = false;
+  state.alertLine1 = line1;
+  state.alertLine2 = line2;
+  if (code && code !== 'RTO15' && code !== 'RTO00') {
+    state.eventLog.unshift({
+      date: state.fullDate, time: fClk(state.clock),
+      code: code, dur: '00ч01', msg: errorCodes[code] || line1
+    });
+  }
+  document.getElementById('ledIndicator').classList.add('blink');
+  beep(1250, 0.18);
+
+  const info = errorExplanations[code] || {
+    why: `Сработало предупреждение тахографа: ${line1} ${line2}.`,
+    fix: 'Остановите ТС в безопасном месте и нажмите кнопку OK для подтверждения.'
+  };
+  setHint(
+    `🚨 Ошибка / Событие: ${line1} ${line2}`,
+    `<b>Почему произошло:</b> ${info.why}<br><b>Как исправить и избежать:</b> ${info.fix}`,
+    true,
+    code ? `Код ${code}` : 'Внимание'
+  );
+
+  if (state.alertBeepInterval) clearInterval(state.alertBeepInterval);
+  if (state.alertTimeout) clearTimeout(state.alertTimeout);
+
+  if (autoClearMs > 0) {
+    state.alertTimeout = setTimeout(() => { clearAlert(); }, autoClearMs);
+  } else {
+    state.alertBeepInterval = setInterval(() => {
+      beep(1350, 0.12);
+      setTimeout(() => beep(980, 0.12), 180);
+    }, 1600);
+    state.alertTimeout = setTimeout(() => { silenceAlertBuzzer(); }, 30000);
+  }
+  render();
+}
+
+function silenceAlertBuzzer() {
+  state.alertLatched = true;
+  if (state.alertBeepInterval) { clearInterval(state.alertBeepInterval); state.alertBeepInterval = null; }
+  if (state.alertTimeout) { clearTimeout(state.alertTimeout); state.alertTimeout = null; }
+  document.getElementById('ledIndicator').classList.remove('blink');
+  render();
+}
+
+function clearAlert() {
+  silenceAlertBuzzer();
+  state.alertActive = false;
+  state.alertLatched = false;
+  updateScreenHint();
+  render();
+}
+
+function resetSleepTimer() {
+  if (state.sleepTimer1) clearTimeout(state.sleepTimer1);
+  if (state.sleepTimer2) clearTimeout(state.sleepTimer2);
+  if (state.sleepStage > 0) return;
+  state.sleepTimer1 = setTimeout(() => {
+    if (!state.ignition && !state.driving && !state.alertActive) {
+      state.sleepStage = 1;
+      setHint('🌙 Режим энергосбережения (Этап 1 — через 25 сек)', 'При выключенном зажигании подсветка дисплея гаснет и выводится адрес www.nrdrive.ru. Нажмите любую кнопку для пробуждения.', false, 'Сон');
+      render();
+      state.sleepTimer2 = setTimeout(() => {
+        if (!state.ignition && !state.driving) { state.sleepStage = 2; render(); }
+      }, 420000);
+    }
+  }, 25000);
+}
+
+function wakeUp(playBeep = true) {
+  if (state.sleepStage > 0) {
+    state.sleepStage = 0;
+    if (playBeep) { initAudio(); beep(1650, 0.06); vibrate(); }
+    updateScreenHint();
+  }
+  resetSleepTimer();
+  render();
+}
+
+function render() {
+  const r1 = document.getElementById('row1'), r2 = document.getElementById('row2'), lcd = document.getElementById('lcdScreen');
+  const setRows = (a, b) => { r1.textContent = lcdFit(a); r2.textContent = lcdFit(b); };
+  const en = state.lang === 'en';
+  const mNames = getModeNames();
+
+  const t1 = getSlotType(1), t2 = getSlotType(2);
+  document.getElementById('slot1').className = 'card-slot' + (state.slot1Key ? ' active' : '') + (state.slot1Key && !state.slot1Auth ? ' unauth' : '') + (t1 === 'controller' ? ' ctrl' : t1 === 'workshop' ? ' ws' : t1 === 'company' ? ' comp' : '');
+  document.getElementById('slot2').className = 'card-slot' + (state.slot2Key ? ' active' : '') + (state.slot2Key && !state.slot2Auth ? ' unauth' : '') + (t2 === 'controller' ? ' ctrl' : t2 === 'workshop' ? ' ws' : t2 === 'company' ? ' comp' : '');
+
+  lcd.className = 'lcd-screen';
+  lcd.style.background = backlightColors[state.colorIdx];
+  let bf = 0.45 + (state.brightness / 8) * 0.55;
+  if (state.dimOnDrive && state.driving) bf *= 0.65;
+  lcd.style.filter = `brightness(${bf.toFixed(2)}) contrast(${(0.8 + state.contrast * 0.08).toFixed(2)})`;
+  if (state.inverted) lcd.classList.add('inverted');
+
+  if (state.sleepStage === 1) { lcd.classList.add('sleep-stage1'); setRows(' www.nrdrive.ru ', ''); return; }
+  if (state.sleepStage === 2) { lcd.classList.add('sleep-stage2'); setRows('', ''); return; }
+
+  if (state.alertActive) {
+    if (!state.alertLatched) lcd.classList.add('alert-red');
+    setRows(state.alertLine1, state.alertLine2);
+    return;
+  }
+
+  if (state.uiMode === 'eject_1') { setRows(en ? `${state.ejectSlot} Ejecting` : `${state.ejectSlot} Извлечение`, en ? `card...` : `карты...`); return; }
+  if (state.uiMode === 'eject_place') { setRows(en ? `End country:` : `Место конца:`, `     [RUS]     ↕`); return; }
+  if (state.uiMode === 'mode_select') {
+    const m = state.modeSelectSlot === 1 ? state.mode1 : state.mode2;
+    setRows(en ? `${state.modeSelectSlot} Activity:` : `${state.modeSelectSlot} Вид деят-ти:`, `  [${symbols[m]} ${mNames[m]}]`);
+    return;
+  }
+
+  const activeKey = state.activeAuthSlot === 1 ? state.slot1Key : state.slot2Key;
+  const curCard = cardProfiles[activeKey] || cardProfiles.driver1;
+
+  if (state.uiMode === 'pin') {
+    if (state.pinStage === 'digits') {
+      let mask = '';
+      for (let i = 0; i < 4; i++) {
+        if (i < state.pinInput.length) mask += '* ';
+        else if (i === state.pinInput.length) mask += `[${state.pinVal}] `;
+        else mask += '_ ';
+      }
+      setRows(en ? `${state.activeAuthSlot} Enter PIN` : `${state.activeAuthSlot} Введите ПИН`, mask.trim());
+    } else if (state.pinStage === 'confirm') {
+      setRows(en ? `${state.activeAuthSlot} Enter PIN` : `${state.activeAuthSlot} Введите ПИН`, `****        (OK)`);
+    } else if (state.pinStage === 'error') {
+      const rem = 3 - curCard.pinAttempts;
+      setRows(en ? `! WRONG PIN!` : `! ПИН НЕ ВЕРЕН!`, rem === 2 ? `Осталось 2 шанса` : (rem === 1 ? `Остался 1 шанс` : `Карта заблокир.!`));
+    } else if (state.pinStage === 'puk_ask') {
+      setRows(`Ввести PUK-код?`, state.pukYes ? `     [Да]      ↕` : `     [Нет]     ↕`);
+    } else if (state.pinStage === 'puk_entry') {
+      setRows(`PUK (12345678):`, '*'.repeat(state.pukInput.length) + `[${state.pinVal}]`);
+    }
+    return;
+  }
+
+  if (state.uiMode === 'welcome_1') { setRows(en ? `${state.activeAuthSlot} Welcome,` : `${state.activeAuthSlot} Здравствуйте,`, curCard.greet); return; }
+  if (state.uiMode === 'welcome_2') { setRows(en ? `${state.activeAuthSlot} Card expiry:` : `${state.activeAuthSlot} Срок карты:`, `до ${curCard.expiry}`); return; }
+  if (state.uiMode === 'welcome_3') { setRows(en ? `${state.activeAuthSlot} Last used:` : `${state.activeAuthSlot} Посл. использ.`, curCard.lastUsed); return; }
+  if (state.uiMode === 'welcome_export') { setRows(`Пора выгрузить`, `данные с карты`); return; }
+  if (state.uiMode === 'welcome_place') { setRows(en ? `Begin country:` : `Место начала:`, `     [RUS]     ↕`); return; }
+  if (state.uiMode === 'ask_manual') { setRows(en ? `Manual entry?` : `Ручной ввод?`, state.manualYes ? `     [Да]      ↕` : `     [Нет]     ↕`); return; }
+  if (state.uiMode === 'manual_fmt') { setRows(`Формат времени`, state.manualUtc ? `[Время UTC(SU)]↕` : `[Местное время]↕`); return; }
+  if (state.uiMode === 'manual_edit') {
+    setRows(`12/11 [${symbols[state.manualAct]}] 13/11`, `19:40 ${mNames[state.manualAct].slice(0,4)} 08:00`);
+    return;
+  }
+  if (state.uiMode === 'manual_confirm') { setRows(`Подтверд. ввод?`, state.manualYes ? `     [Да]      ↕` : `     [Нет]     ↕`); return; }
+  if (state.uiMode === 'ready_drive') { setRows(en ? `◉ Ready to` : `◉ Готов к`, en ? `  drive` : `  управлению`); return; }
+
+  if (state.uiMode === 'report_wiz') { renderReportWizard(setRows); return; }
+  if (state.uiMode === 'param_edit') { renderParamEdit(setRows); return; }
+  if (state.uiMode === 'test_run') { renderTestRun(setRows); return; }
+  if (state.uiMode === 'simple_info') { setRows(state.infoL1, state.infoL2); return; }
+
+  if (state.uiMode === 'menu') { const m = getMenu(); setRows(en ? `MAIN MENU:` : `ГЛАВНОЕ МЕНЮ:`, `${m[state.menuIdx].title}`); return; }
+  if (state.uiMode === 'sub') { const m = getMenu(); setRows(m[state.menuIdx].title, `>${m[state.menuIdx].items[state.subIdx].name}`); return; }
+
+  const op = getOperatingMode();
+  const c1 = t1 ? '1▊' : (state.slot1Key ? '1?' : '1_');
+  const c2 = t2 ? '2▊' : (state.slot2Key ? '2?' : '2_');
+  const s1 = state.driving ? '◉' : symbols[state.mode1], s2 = symbols[state.mode2];
+  const remDrive = Math.max(0, state.maxDriveTime - state.driveCont1);
+  let rb = `${fClk(state.clock)}${op.icon}`;
+  if (state.isOut) rb = `   OUT`;
+  else if (state.isFerry) rb = `${fClk(state.clock)}⛴`;
+
+  switch (state.screenIdx) {
+    case 0: setRows(`${c1}${s1}${fDur(state.dur1)}◉‖${fDur(remDrive)}◉`, `${c2}${s2}${fDur(state.dur2)}  ${rb}`); break;
+    case 1: setRows(`${c1}${s1}${fDur(state.dur1)}  ‖${fDur(state.breakSum1)}`, `${c2}${s2}${fDur(state.dur2)}  ${rb}`); break;
+    case 2: setRows(`1◉${fDur(state.driveCont1)} ◉|${fDur(state.week1Drive1)}`, `◉►${fDur(state.shiftDrive1)} ◉‖${fDur(state.week2Drive1)}`); break;
+    case 3: setRows(`2◉${fDur(state.driveCont2)}  ‖${fDur(state.breakSum2)}`, `◉►${fDur(state.shiftDrive2)} ◉‖${fDur(state.week2Drive2)}`); break;
+    case 4:
+      const utcMins = state.clock - state.tz * 60, secStr = String(state.seconds).padStart(2, '0');
+      setRows(`${fClk(state.clock)}•     ${state.dateStr}`, `${fClk(utcMins)}:${secStr}    ${state.yearStr}`);
+      break;
+    case 5:
+      const spdStr = String(state.driving ? state.currentSpeed : 0).padStart(3, '0');
+      const odoStr = state.odo.toFixed(1).padStart(9, ' ');
+      setRows(`${c1} ${spdStr}${en ? 'km/h' : 'км/ч'}     ${op.icon}`, `${c2}${odoStr}${en ? 'km' : 'км'}`);
+      break;
+    case 6:
+      const gnssSpd = String(state.driving ? state.currentSpeed : 0).padStart(3, ' ');
+      setRows(`56.8389сш| ${gnssSpd}`, `60.6057вд| ${en ? 'km/h' : 'км/ч'}`);
+      break;
+  }
+}
+
+function appendDailyLog(mode, mins) {
+  if (mins <= 0) return;
+  const last = state.dailyLog[state.dailyLog.length - 1];
+  if (last && last.mode === mode) {
+    last.mins = Math.min(1440, last.mins + mins);
+  } else {
+    state.dailyLog.push({ start: fClk(state.clock), mode: mode, mins: mins });
+  }
+}
+
+function startHold(slot) {
+  wakeUp();
+  if (state.driving) { triggerAlert('! Запрещено во', 'время движения', '129', 3000); return; }
+  state.holdSlot = slot;
+  state.holdStartTime = Date.now();
+  if (state.holdTimer) clearTimeout(state.holdTimer);
+
+  state.holdTimer = setTimeout(() => {
+    const hasCard = slot === 1 ? state.slot1Key : state.slot2Key;
+    if (!hasCard) { state.holdSlot = null; beep(600, 0.1); render(); return; }
+    vibrate(40); beep(2100, 0.12);
+    state.ejectSlot = slot; state.uiMode = 'eject_1'; state.holdSlot = null;
+    setHint(`⏏ Выгрузка карты из Слота ${slot}`, `Идет запись последних данных на чип карты. Сейчас тахограф предложит подтвердить страну окончания смены (RUS).`, false, `Слот ${slot}`);
+    render();
+    setTimeout(() => {
+      if (getSlotType(slot) === 'driver') {
+        state.uiMode = 'eject_place'; render();
+        state.holdTimer = setTimeout(() => { finishCardEject(slot); }, 5000);
+      } else finishCardEject(slot);
+    }, 1400);
+  }, 1500);
+}
+
+function endHold(slot) {
+  if (!state.holdSlot || state.holdSlot !== slot) return;
+  const elapsed = Date.now() - state.holdStartTime;
+  if (state.holdTimer) { clearTimeout(state.holdTimer); state.holdTimer = null; }
+  state.holdSlot = null;
+
+  if (elapsed < 1450 && !state.driving) {
+    initAudio(); beep(1850, 0.04); vibrate(15);
+    if (state.uiMode === 'mode_select' && state.modeSelectSlot === slot) {
+      if (slot === 1) { state.mode1 = (state.mode1 + 1) % 3; state.dur1 = 0; }
+      else { state.mode2 = (state.mode2 + 1) % 3; state.dur2 = 0; }
+    } else {
+      state.uiMode = 'mode_select'; state.modeSelectSlot = slot;
+    }
+    const m = slot === 1 ? state.mode1 : state.mode2;
+    setHint(
+      `🔄 Переключение режима Водителя ${slot}: [${symbols[m]} ${getModeNames()[m]}]`,
+      `Нажимайте коротко кнопку <b>«${slot}»</b> для выбора: <b>h (Отдых)</b>, <b>⚒ (Работа)</b> или <b>☒ (Готовность)</b>. Нажмите <b>OK</b> (или подождите 3 сек) для сохранения.`,
+      false, `Кнопка ${slot}`
+    );
+    if (state.modeSelectTimer) clearTimeout(state.modeSelectTimer);
+    state.modeSelectTimer = setTimeout(() => {
+      if (state.uiMode === 'mode_select') { state.uiMode = 'main'; beep(2200, 0.06); updateScreenHint(); render(); }
+    }, 2800);
+    render();
+  }
+}
+
+function cancelHold(slot) {
+  if (state.holdSlot === slot) { if (state.holdTimer) clearTimeout(state.holdTimer); state.holdSlot = null; }
+}
+
+function finishCardEject(slot) {
+  if (state.holdTimer) { clearTimeout(state.holdTimer); state.holdTimer = null; }
+  if (slot === 1) { state.slot1Key = null; state.slot1Auth = false; }
+  else { state.slot2Key = null; state.slot2Auth = false; }
+  updateSimCardButtons();
+  state.uiMode = 'main'; beep(1500, 0.15);
+  setHint(`✅ Карта извлечена из Слота ${slot}`, `Сеанс закрыт корректно. Не забудьте забрать карту из слота.`, false, `Слот ${slot}`);
+  render();
+}
+
+function toggleSlotCard(slot) {
+  wakeUp();
+  const currentKey = slot === 1 ? state.slot1Key : state.slot2Key;
+  if (currentKey) {
+    if (state.driving) { triggerAlert('! Запрещено во', 'время движения', '129', 3000); return; }
+    state.ejectSlot = slot; state.uiMode = 'eject_1'; render();
+    setTimeout(() => finishCardEject(slot), 1000);
+    return;
+  }
+
+  const chosenKey = document.getElementById(slot === 1 ? 'selSlot1' : 'selSlot2').value;
+  const chosenCard = cardProfiles[chosenKey];
+
+  if (!state.activated && chosenCard.type !== 'workshop') {
+    triggerAlert('! Тахограф не', 'активирован!', '01', 3000);
+    return;
+  }
+
+  if (slot === 1) { state.slot1Key = chosenKey; state.slot1Auth = false; }
+  else { state.slot2Key = chosenKey; state.slot2Auth = false; }
+  updateSimCardButtons();
+
+  if (state.driving) {
+    triggerAlert('1!◉ Ввод карты', 'во время управ', '05');
+    return;
+  }
+
+  state.activeAuthSlot = slot;
+  if (chosenCard.blocked) {
+    state.uiMode = 'pin'; state.pinStage = 'puk_ask'; state.pukYes = true;
+  } else {
+    state.uiMode = 'pin'; state.pinStage = 'digits'; state.pinInput = ''; state.pinVal = 1;
+    setHint(
+      `🔐 Введите ПИН-код карты (Слот ${slot}): 1234`,
+      `Используйте кнопки <b>▲</b> и <b>▼</b> для выбора цифры и кнопку <b>OK</b> для перехода к следующей цифре. Без ввода ПИН-кода карта не активна!`,
+      false, `Ввод ПИН`
+    );
+  }
+  render();
+}
+
+function updateSimCardButtons() {
+  document.getElementById('card1BtnTxt').textContent = state.slot1Key ? 'Извлечь Слот 1' : 'Вставить в Слот 1';
+  document.getElementById('card2BtnTxt').textContent = state.slot2Key ? 'Извлечь Слот 2' : 'Вставить в Слот 2';
+}
+
+function swapDriverCards() {
+  wakeUp();
+  if (state.driving) { triggerAlert('! Запрещено во', 'время движения', '129', 3000); return; }
+  if (!state.slot1Key && !state.slot2Key) {
+    triggerAlert('! Слоты пусты', 'Вставьте карты', null, 2200);
+    return;
+  }
+  const tmpK = state.slot1Key, tmpA = state.slot1Auth;
+  state.slot1Key = state.slot2Key; state.slot1Auth = state.slot2Auth;
+  state.slot2Key = tmpK; state.slot2Auth = tmpA;
+  updateSimCardButtons(); beep(2100, 0.12);
+  showSimpleInfo('Смена карт 1↔2', 'Выполнено!');
+}
+
+function startWelcomeSequence() {
+  if (state.activeAuthSlot === 1) state.slot1Auth = true;
+  else state.slot2Auth = true;
+
+  const op = getOperatingMode();
+  if (op.conflict) { triggerAlert('! Конфликт', 'карт', '02'); return; }
+
+  const key = state.activeAuthSlot === 1 ? state.slot1Key : state.slot2Key;
+  const c = cardProfiles[key] || cardProfiles.driver1;
+  state.uiMode = 'welcome_1';
+  setHint(`👋 Приветствие: ${c.fullName}`, `ПИН-код верный! Сейчас тахограф покажет срок действия карты (${c.expiry}), дату последнего извлечения и предложит ручной ввод деятельности.`, false, `Аутентификация`);
+  render();
+
+  setTimeout(() => {
+    if (state.uiMode !== 'welcome_1') return;
+    state.uiMode = 'welcome_2'; render();
+    setTimeout(() => {
+      if (state.uiMode !== 'welcome_2') return;
+      if (c.type !== 'driver') {
+        if (c.type === 'company' && !state.dataLocked) openParamEdit('lock');
+        else {
+          showSimpleInfo('РЕЖИМ: ' + op.label, c.greet);
+          setTimeout(() => { if (state.uiMode === 'simple_info') { state.uiMode = 'main'; updateScreenHint(); render(); } }, 1800);
+        }
+        return;
+      }
+      state.uiMode = 'welcome_3'; render();
+      setTimeout(() => {
+        if (state.uiMode !== 'welcome_3') return;
+        state.uiMode = c.daysSinceExport >= 28 ? 'welcome_export' : 'welcome_place';
+        render();
+      }, 1400);
+    }, 1400);
+  }, 1400);
+}
+
+function btnPress(b) {
+  vibrate(15);
+  if (state.sleepStage > 0) { wakeUp(true); return; }
+  resetSleepTimer(); initAudio();
+
+  if (state.alertActive) {
+    if (!state.alertLatched) { silenceAlertBuzzer(); beep(1800, 0.04); return; }
+    if (b === 'ok' || b === 'back') { clearAlert(); beep(2000, 0.05); return; }
+    return;
+  }
+  if (state.uiMode === 'test_run' && state.currentTestType === 'keys') { handleKeyTestPress(b); return; }
+  beep(1850, 0.04);
+
+  if (state.uiMode === 'eject_place') { if (b === 'ok') finishCardEject(state.ejectSlot); return; }
+  if (state.uiMode === 'mode_select') {
+    if (b === 'up') { if (state.modeSelectSlot === 1) state.mode1 = (state.mode1 + 1) % 3; else state.mode2 = (state.mode2 + 1) % 3; }
+    else if (b === 'down') { if (state.modeSelectSlot === 1) state.mode1 = (state.mode1 + 2) % 3; else state.mode2 = (state.mode2 + 2) % 3; }
+    else if (b === 'ok' || b === 'back') { if (state.modeSelectTimer) clearTimeout(state.modeSelectTimer); state.uiMode = 'main'; updateScreenHint(); }
+    render(); return;
+  }
+
+  if (state.uiMode === 'pin') {
+    const key = state.activeAuthSlot === 1 ? state.slot1Key : state.slot2Key;
+    const c = cardProfiles[key] || cardProfiles.driver1;
+    if (state.pinStage === 'digits') {
+      if (b === 'up') state.pinVal = (state.pinVal + 1) % 10;
+      else if (b === 'down') state.pinVal = (state.pinVal + 9) % 10;
+      else if (b === 'back' && state.pinInput.length > 0) state.pinInput = state.pinInput.slice(0, -1);
+      else if (b === 'ok') {
+        state.pinInput += String(state.pinVal); state.pinVal = 1;
+        if (state.pinInput.length === 4) state.pinStage = 'confirm';
+      }
+    } else if (state.pinStage === 'confirm') {
+      if (b === 'back') { state.pinInput = state.pinInput.slice(0, -1); state.pinStage = 'digits'; }
+      else if (b === 'ok') {
+        if (state.pinInput === c.pin) { c.pinAttempts = 0; beep(2300, 0.12); startWelcomeSequence(); return; }
+        else {
+          c.pinAttempts++; beep(450, 0.3); if (c.pinAttempts >= 3) c.blocked = true; state.pinStage = 'error';
+          setHint(`❌ Введен неверный ПИН-код!`, `Правильный ПИН-код для всех карт тренажера — <b>1234</b>. После 3 неверных попыток карта блокируется до ввода PUK-кода (12345678).`, true, `Ошибка ПИН`);
+        }
+      }
+    } else if (state.pinStage === 'error') {
+      if (b === 'ok') {
+        if (c.blocked) { state.pinStage = 'puk_ask'; state.pukYes = true; }
+        else { state.pinInput = ''; state.pinVal = 1; state.pinStage = 'digits'; }
+      }
+    } else if (state.pinStage === 'puk_ask') {
+      if (b === 'up' || b === 'down') state.pukYes = !state.pukYes;
+      else if (b === 'ok') {
+        if (state.pukYes) { state.pinStage = 'puk_entry'; state.pukInput = ''; state.pinVal = 1; }
+        else finishCardEject(state.activeAuthSlot);
+      }
+    } else if (state.pinStage === 'puk_entry') {
+      if (b === 'up') state.pinVal = (state.pinVal + 1) % 10;
+      else if (b === 'down') state.pinVal = (state.pinVal + 9) % 10;
+      else if (b === 'back') state.pukInput = state.pukInput.slice(0, -1);
+      else if (b === 'ok') {
+        state.pukInput += String(state.pinVal);
+        if (state.pukInput.length === 8) {
+          if (state.pukInput === c.puk) { c.blocked = false; c.pinAttempts = 0; beep(2300, 0.15); startWelcomeSequence(); return; }
+          else { triggerAlert('! КАРТА', 'НЕДЕЙСТВИТЕЛЬНА', '01'); finishCardEject(state.activeAuthSlot); return; }
+        }
+      }
+    }
+    render(); return;
+  }
+
+  if (state.uiMode === 'welcome_1') { if (b === 'ok') state.uiMode = 'welcome_2'; render(); return; }
+  if (state.uiMode === 'welcome_2') { if (b === 'ok') state.uiMode = 'welcome_3'; render(); return; }
+  if (state.uiMode === 'welcome_3') { if (b === 'ok') state.uiMode = 'welcome_place'; render(); return; }
+  if (state.uiMode === 'welcome_export') { if (b === 'ok') state.uiMode = 'welcome_place'; render(); return; }
+  if (state.uiMode === 'welcome_place') {
+    if (b === 'ok') {
+      state.uiMode = 'ask_manual'; state.manualYes = true;
+      setHint(`📝 Ручной ввод данных (п. 11.1.4 РЭ)`, `Рекомендуется выбрать <b>«Да»</b>, чтобы закрыть время межсменного отдыха <b>h</b> с момента прошлого извлечения карты. При отказе («Нет») в чеке останется знак <b>«?»</b>.`, false, `Ручной ввод`);
+    }
+    render(); return;
+  }
+
+  if (state.uiMode === 'ask_manual') {
+    if (b === 'up' || b === 'down') state.manualYes = !state.manualYes;
+    else if (b === 'ok') {
+      if (state.manualYes) { state.uiMode = 'manual_fmt'; state.manualUtc = false; }
+      else { state.unknownSum1 += 60; showReadyToDrive(); return; }
+    }
+    render(); return;
+  }
+  if (state.uiMode === 'manual_fmt') {
+    if (b === 'up' || b === 'down') state.manualUtc = !state.manualUtc;
+    else if (b === 'back') state.uiMode = 'ask_manual';
+    else if (b === 'ok') { state.uiMode = 'manual_edit'; state.manualAct = 0; }
+    render(); return;
+  }
+  if (state.uiMode === 'manual_edit') {
+    if (b === 'up') state.manualAct = (state.manualAct + 1) % 3;
+    else if (b === 'down') state.manualAct = (state.manualAct + 2) % 3;
+    else if (b === 'back') state.uiMode = 'manual_fmt';
+    else if (b === 'ok') { state.uiMode = 'manual_confirm'; state.manualYes = true; }
+    render(); return;
+  }
+  if (state.uiMode === 'manual_confirm') {
+    if (b === 'up' || b === 'down') state.manualYes = !state.manualYes;
+    else if (b === 'back') state.uiMode = 'manual_edit';
+    else if (b === 'ok') {
+      if (state.manualYes) {
+        if (state.manualAct === 0) state.restSum1 += 120; else state.workSum1 += 60;
+        showReadyToDrive(); return;
+      } else state.uiMode = 'manual_edit';
+    }
+    render(); return;
+  }
+
+  if (state.driving && (b === 'ok' || state.uiMode !== 'main')) {
+    triggerAlert('! Запрещено во', 'время движения', '129', 3000); state.uiMode = 'main'; return;
+  }
+  if (state.uiMode === 'report_wiz') { handleReportWizardBtn(b); return; }
+  if (state.uiMode === 'param_edit') { handleParamEditBtn(b); return; }
+  if (state.uiMode === 'test_run' || state.uiMode === 'simple_info') { if (b === 'ok' || b === 'back') { state.uiMode = 'main'; updateScreenHint(); render(); } return; }
+
+  const m = getMenu();
+  if (b === 'ok') {
+    if (state.uiMode === 'main') {
+      state.uiMode = 'menu'; state.menuIdx = 0;
+      setHint(`📂 Главное меню тахографа`, `Листайте разделы кнопками <b>▲ / ▼</b>, вход в раздел — <b>OK</b>, выход назад на основные экраны — <b>↶</b>.`, false, `Меню`);
+    }
+    else if (state.uiMode === 'menu') { state.uiMode = 'sub'; state.subIdx = 0; }
+    else if (state.uiMode === 'sub') { m[state.menuIdx].items[state.subIdx].act(); return; }
+  } else if (b === 'back') {
+    if (state.uiMode === 'sub') state.uiMode = 'menu';
+    else if (state.uiMode === 'menu') { state.uiMode = 'main'; updateScreenHint(); }
+    else closeReceipt();
+  } else if (b === 'up') {
+    if (state.uiMode === 'main') { state.screenIdx = (state.screenIdx + 6) % 7; updateScreenHint(); }
+    else if (state.uiMode === 'menu') state.menuIdx = (state.menuIdx + m.length - 1) % m.length;
+    else if (state.uiMode === 'sub') { const len = m[state.menuIdx].items.length; state.subIdx = (state.subIdx + len - 1) % len; }
+  } else if (b === 'down') {
+    if (state.uiMode === 'main') { state.screenIdx = (state.screenIdx + 1) % 7; updateScreenHint(); }
+    else if (state.uiMode === 'menu') state.menuIdx = (state.menuIdx + 1) % m.length;
+    else if (state.uiMode === 'sub') { const len = m[state.menuIdx].items.length; state.subIdx = (state.subIdx + 1) % len; }
+  }
+  render();
+}
+
+function showReadyToDrive() {
+  state.uiMode = 'ready_drive';
+  if (state.activeAuthSlot === 1) state.mode1 = 1; else state.mode2 = 2;
+  setHint(`✅ Тахограф готов к управлению!`, `Карта водителя успешно принята. Теперь можно начинать движение без штрафов и ошибок.`, false, `Готов`);
+  render();
+  setTimeout(() => { if (state.uiMode === 'ready_drive') { state.uiMode = 'main'; state.screenIdx = 0; updateScreenHint(); render(); } }, 1500);
+}
+function showSimpleInfo(l1, l2) { state.uiMode = 'simple_info'; state.infoL1 = l1; state.infoL2 = l2; render(); }
+function toggleOutMode() { if (state.isFerry) state.isFerry = false; state.isOut = !state.isOut; beep(2100, 0.1); showSimpleInfo('Режим OUT', state.isOut ? 'OUT+ Установлен' : '+OUT Завершен'); }
+function setFerryMode() { if (state.isOut) { triggerAlert('! Запрещено при', 'режиме OUT', null, 2500); return; } state.isFerry = !state.isFerry; beep(2100, 0.1); showSimpleInfo('⛴ Паром/поезд', state.isFerry ? 'Установлен!' : 'Отключен'); }
+function resetDailyOdo() { state.startOdo = state.odo; beep(2200, 0.12); showSimpleInfo('Сброс пробега', 'Выполнено! 0км'); }
+function openParamEdit(paramKey) { state.uiMode = 'param_edit'; state.currentParam = paramKey; render(); }
+
+const usbExportItems = ['Архив карты', 'Архив тахогр.', 'Архив НКМ', 'Метрология'];
+function renderParamEdit(setRows) {
+  const p = state.currentParam;
+  if (p === 'brightness') setRows('Яркость дисплея', `[${'█'.repeat(state.brightness) + '░'.repeat(8 - state.brightness)}] 0${state.brightness}↕`);
+  else if (p === 'color') setRows('Цвет дисплея', `[${'█'.repeat(state.colorIdx + 1) + '░'.repeat(6 - state.colorIdx)}] 0${state.colorIdx + 1}↕`);
+  else if (p === 'dim') setRows('Управл. подсв.', state.dimOnDrive ? ' [Приглушение] ↕' : '   [Ручная]    ↕');
+  else if (p === 'invert') setRows('Инверсия диспл.', state.inverted ? '     [Да]      ↕' : '     [Нет]     ↕');
+  else if (p === 'contrast') setRows('Контраст диспл.', `[${'█'.repeat(state.contrast) + '░'.repeat(8 - state.contrast)}] 0${state.contrast}↕`);
+  else if (p === 'sound') setRows('Звук динамика', `  [${state.soundTone === 0 ? 'Выключен' : 'Звук ' + state.soundTone}]  ↕`);
+  else if (p === 'local_time') setRows('Местное время', ` [UTC(SU)${state.tz >= 0 ? '+' : ''}${state.tz}] ↕`);
+  else if (p === 'utc_corr') setRows('Время UTC(SU)', ' [+1м / -1м]   ↕');
+  else if (p === 'lock') setRows(state.dataLocked ? 'Разблокировать?' : 'Блокировать?', '     [Да]      ↕');
+  else if (p === 'auto_rest') setRows('Автомат. отдых', state.autoRest ? '     [Да]      ↕' : '     [Нет]     ↕');
+  else if (p === 'ex_mode') setRows('Взрывобезопасн.', state.exMode ? '  [Включить]   ↕' : '  [Выключить]  ↕');
+  else if (p === 'ws_odo') setRows('Одометр ТС (км)', ` ${state.odo.toFixed(1)} ↕`);
+  else if (p === 'ws_w') setRows('Коэфф. W имп/км', `    ${state.workshopData.wFactor}     ↕`);
+  else if (p === 'ws_speed') setRows('Лимит скорости', `   ${state.speedLimit} км/ч   ↕`);
+  else if (p === 'ws_act') setRows('Активация БУ:', state.activated ? ' [Активирован] ↕' : ' [Режим изгот.]↕');
+  else if (p === 'usb_menu') setRows('Выгрузка на USB', `[${usbExportItems[state.usbExportType]}]↕`);
+}
+
+function handleParamEditBtn(b) {
+  const p = state.currentParam;
+  if (b === 'back') { state.uiMode = 'sub'; render(); return; }
+  if (b === 'ok') {
+    if (p === 'lock') {
+      const op = getOperatingMode().mode;
+      if (op !== 'company' && op !== 'workshop') { triggerAlert('! Нужна карта', 'предприятия', null, 2500); state.uiMode = 'main'; return; }
+      state.dataLocked = !state.dataLocked; showSimpleInfo('Выполнено!', state.dataLocked ? 'Т Заблокировано' : 'Т Открыто'); return;
+    }
+    if (p === 'usb_menu') { quickUsbExport(); return; }
+    beep(2100, 0.08); state.uiMode = 'sub'; render(); return;
+  }
+  const dir = b === 'up' ? 1 : -1;
+  if (p === 'brightness') state.brightness = Math.min(8, Math.max(1, state.brightness + dir));
+  else if (p === 'color') state.colorIdx = (state.colorIdx + dir + 7) % 7;
+  else if (p === 'dim') state.dimOnDrive = !state.dimOnDrive;
+  else if (p === 'invert') state.inverted = !state.inverted;
+  else if (p === 'contrast') state.contrast = Math.min(8, Math.max(1, state.contrast + dir));
+  else if (p === 'sound') state.soundTone = (state.soundTone + dir + 4) % 4;
+  else if (p === 'local_time') { state.tz = Math.min(12, Math.max(-12, state.tz + dir)); state.clock = (state.clock + dir * 60 + 1440) % 1440; }
+  else if (p === 'utc_corr') state.clock = (state.clock + dir + 1440) % 1440;
+  else if (p === 'auto_rest') state.autoRest = !state.autoRest;
+  else if (p === 'ex_mode') state.exMode = !state.exMode;
+  else if (p === 'ws_odo') { state.odo = Math.max(0, state.odo + dir * 100); state.startOdo = Math.min(state.startOdo, state.odo); }
+  else if (p === 'ws_w') state.workshopData.wFactor = Math.max(4000, state.workshopData.wFactor + dir * 100);
+  else if (p === 'ws_speed') state.speedLimit = Math.min(130, Math.max(60, state.speedLimit + dir * 5));
+  else if (p === 'ws_act') state.activated = !state.activated;
+  else if (p === 'usb_menu') state.usbExportType = (state.usbExportType + dir + 4) % 4;
+  render();
+}
+
+function startReportWizard(type) { state.reportPending = { type: type, step: 0, slot: 1, date: '2026.11.13', utc: true, out: 0 }; state.uiMode = 'report_wiz'; render(); }
+function renderReportWizard(setRows) {
+  const rp = state.reportPending, outModes = ['▼ Печать', '▯ Дисплей', '🔌 USB-флеш'];
+  if (rp.step === 0) setRows('Выбрать карту', `  [Карта ${rp.slot}]   ↕`);
+  else if (rp.step === 1) setRows('Введите дату', ` [${rp.date}] ↕`);
+  else if (rp.step === 2) setRows('Время отчета', rp.utc ? '[Время UTC(SU)]↕' : '[Местное время]↕');
+  else if (rp.step === 3) setRows('Способ вывода', ` [${outModes[rp.out]}] ↕`);
+}
+function handleReportWizardBtn(b) {
+  const rp = state.reportPending;
+  if (b === 'back') { if (rp.step > 0) { rp.step--; render(); } else { state.uiMode = 'sub'; render(); } return; }
+  if (b === 'up' || b === 'down') {
+    if (rp.step === 0) rp.slot = rp.slot === 1 ? 2 : 1;
+    else if (rp.step === 2) rp.utc = !rp.utc;
+    else if (rp.step === 3) rp.out = (rp.out + (b === 'up' ? 1 : 2)) % 3;
+    render(); return;
+  }
+  if (b === 'ok') {
+    if (rp.step < 3) { rp.step++; render(); }
+    else { state.uiMode = 'main'; if (rp.out === 2) quickUsbExport(); else printReport(rp.type); }
+  }
+}
+
+function quickUsbExport() {
+  wakeUp();
+  if (state.driving) { triggerAlert('! Запрещено во', 'время движения', '129', 3000); return; }
+  if (!getSlotType(1) && !getSlotType(2)) { triggerAlert('! Ошибка USB', 'Нет авт. карты', '52', 3000); return; }
+  showSimpleInfo('Выгрузка данных', '🔌 █████░░░░░');
+  setTimeout(() => {
+    beep(2300, 0.15); cardProfiles.driver1.daysSinceExport = 0; cardProfiles.driver2.daysSinceExport = 0;
+    showSimpleInfo('🔌 Выгрузка', 'завершена!');
+    setTimeout(() => { if (state.uiMode === 'simple_info') { state.uiMode = 'main'; render(); } }, 1800);
+  }, 1500);
+}
+
+function runSpecificTest(type) {
+  state.currentTestType = type; state.uiMode = 'test_run';
+  if (type === 'preflight') { printReport('preflight'); state.uiMode = 'main'; return; }
+  if (type === 'printer') { printReport('test_print'); showSimpleInfo('▼ Тест принтера', '      OK'); return; }
+  if (type === 'nkm') { printReport('nkm'); showSimpleInfo('🔒 Тест НКМ', '     НОРМ.'); return; }
+  if (type === 'slots') { showSimpleInfo('Тест картоводов', 'С1:' + (getSlotType(1) ? 'ОК' : 'НЕТ') + ' С2:' + (getSlotType(2) ? 'ОК' : 'НЕТ')); return; }
+  if (type === 'display') {
+    showSimpleInfo('████████████████', '████████████████');
+    setTimeout(() => { showSimpleInfo('▯ Тест дисплея', '      OK'); }, 1200);
+    return;
+  }
+  if (type === 'keys') { state.keyTestIdx = 0; render(); }
+}
+const keyTestOrder = [{ code: 'ok', label: '"OK"' }, { code: 'up', label: '"▲"' }, { code: 'down', label: '"▼"' }, { code: 'back', label: '"↶"' }];
+function renderTestRun(setRows) { if (state.currentTestType === 'keys') setRows('Нажмите кнопку', `     ${keyTestOrder[state.keyTestIdx].label}`); }
+function handleKeyTestPress(b) {
+  if (b === keyTestOrder[state.keyTestIdx].code) {
+    beep(2100, 0.05); state.keyTestIdx++;
+    if (state.keyTestIdx >= keyTestOrder.length) showSimpleInfo('Тест клавиатуры', '      OK'); else render();
+  } else beep(500, 0.15);
+}
+
+function quickPrintMenu() { wakeUp(); if (state.driving) { triggerAlert('! Запрещено во', 'время движения', '129', 3000); return; } printReport('card_daily'); }
+function togglePaper(btn) { state.hasPaper = !state.hasPaper; btn.querySelector('span').textContent = state.hasPaper ? 'Бумага: ЕСТЬ' : 'Бумага: НЕТ'; }
+
+function explainReceiptFront() {
+  const tripKm = Math.max(0, state.odo - state.startOdo).toFixed(1);
+  setHint(
+    `🧾 Пояснение к распечатке чека`,
+    `Обратите внимание: начальный одометр (<b>${state.startOdo.toFixed(1)} км</b>) + суточный пробег (<b>${tripKm} км</b>) = текущий одометр на Экране №6 тахографа (<b>${state.odo.toFixed(1)} км</b>). Нажмите синюю кнопку <b>«Перевернуть чек»</b>, чтобы вручную заполнить бланк на обороте!`,
+    false, `Распечатка`
+  );
+}
+
+function renderManualBackForm() {
+  const d1 = cardProfiles[state.slot1Key] || cardProfiles.driver1;
+  const back = document.getElementById('paperBack');
+  const yCoords = [24, 42, 60, 78];
+  let pts = [];
+  for (let h = 0; h < 24; h++) {
+    const x1 = 28 + h * 13.5, x2 = 28 + (h + 1) * 13.5;
+    const y = yCoords[state.manualGraphHours[h]];
+    pts.push(`${x1},${y}`, `${x2},${y}`);
+  }
+  back.innerHTML = `
+    <div style="border:1px solid #cbd5e1;padding:10px;border-radius:4px;background:#fff;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="color:#dc2626;font-weight:900;font-size:17px;">НРД — Бланк ручного учета (п. 11.1.8 РЭ)</span>
+        <span style="font-size:10px;color:#475569;">Нажимайте на часы в сетке!</span>
+      </div>
+      <div class="manual-input-row">
+        <input id="manFio" value="${d1.fullName}" placeholder="ФИО водителя" />
+        <input id="manCard" value="${d1.cardNum.slice(4,21)}" placeholder="№ карты водителя" />
+      </div>
+      <div class="manual-input-row">
+        <input id="manPlate" value="А777АА196" placeholder="Рег. № ТС" />
+        <input id="manDate" value="${state.fullDate}" placeholder="Дата учета" />
+      </div>
+      <div style="font-size:10.5px;color:#334155;margin-bottom:4px;"><b>Интерактивная сетка (кликните по столбцу часа, чтобы изменить режим ◉ / ⚒ / ☒ / h):</b></div>
+      <svg viewBox="0 0 365 95" style="width:100%;border:1px solid #64748b;background:#f8fafc;cursor:pointer;" onclick="onManualGridClick(event, this)">
+        <g stroke="#cbd5e1" stroke-width="1">
+          ${Array.from({length: 25}, (_, i) => `<line x1="${28 + i*13.5}" y1="14" x2="${28 + i*13.5}" y2="86"/>`).join('')}
+          <line x1="28" y1="24" x2="352" y2="24"/><line x1="28" y1="42" x2="352" y2="42"/>
+          <line x1="28" y1="60" x2="352" y2="60"/><line x1="28" y1="78" x2="352" y2="78"/>
+        </g>
+        <g font-size="7.5" fill="#334155" font-family="monospace">
+          ${Array.from({length: 13}, (_, i) => `<text x="${24 + i*27}" y="10">${String(i*2).padStart(2,'0')}</text>`).join('')}
+          <text x="6" y="27" font-size="9">◉</text><text x="6" y="45" font-size="9">⚒</text>
+          <text x="6" y="63" font-size="9">☒</text><text x="6" y="81" font-size="9">h</text>
+        </g>
+        <polyline fill="none" stroke="#dc2626" stroke-width="2.6" points="${pts.join(' ')}"/>
+      </svg>
+      <div style="margin-top:6px;font-size:11px;display:flex;justify-content:space-between;color:#1e293b;">
+        <span>Заполняется при поломке тахографа или карты</span>
+        <span><b>Подпись:</b> <i>/${d1.greet}/</i></span>
+      </div>
+    </div>`;
+}
+
+function onManualGridClick(e, svgEl) {
+  const rect = svgEl.getBoundingClientRect();
+  const relX = ((e.clientX - rect.left) / rect.width) * 365;
+  const hourIdx = Math.floor((relX - 28) / 13.5);
+  if (hourIdx >= 0 && hourIdx < 24) {
+    state.manualGraphHours[hourIdx] = (state.manualGraphHours[hourIdx] + 1) % 4;
+    beep(1950, 0.03);
+    renderManualBackForm();
+    const names = ['◉ Управление', '⚒ Работа', '☒ Готовность', 'h Отдых'];
+    setHint(
+      `✍️ Заполнение бланка вручную: час ${String(hourIdx).padStart(2,'0')}:00–${String(hourIdx+1).padStart(2,'0')}:00`,
+      `Установлен режим: <b>${names[state.manualGraphHours[hourIdx]]}</b>. По п. 11.1.8 РЭ такой бланк заполняется на обороте термоленты при отказе карты или тахографа.`,
+      false, `Ручной бланк`
+    );
+  }
+}
+
+function printReport(type) {
+  if (!state.hasPaper) { triggerAlert('ОШИБКА ПЕЧАТИ!', 'НЕТ БУМАГИ', '50'); return; }
+  vibrate(30); beep(880, 0.18);
+  const wrap = document.getElementById('receiptArea'), front = document.getElementById('paperText');
+  wrap.style.display = 'flex'; wrap.classList.remove('flipped');
+  document.getElementById('flipBtn').textContent = '🔄 Перевернуть чек (Заполнить бланк вручную)';
+
+  const utcStr = fClk(state.clock - state.tz * 60), d1 = cardProfiles[state.slot1Key] || cardProfiles.driver1, ws = state.workshopData;
+  const startKm = state.startOdo.toFixed(1), endKm = state.odo.toFixed(1), tripKm = Math.max(0, state.odo - state.startOdo).toFixed(1);
+  const nkmFooter = `------------------НКМ-------------------\n📅 ${state.fullDate} ${utcStr}:04\n🌐 56.83892104 с.ш. / 60.60570112 в.д.\nСрок действия:               ${ws.nkmExpiry}\nЗав.№: ${ws.nkmNum} (№ в перечне: 5)\n----------------------------------------\nП ________________ (Место контроля)\n◉ ________________ (Подпись водителя)`;
+
+  if (type === 'test_print') front.textContent = `                  НРД\n▼ ${state.fullDate} ${utcStr} UTC_SU\n----------------------------------------\n !"#$%&'()*+,-./0123456789:;<=>?@\n ABCDEFGHIJKLMNOPQRSTUVWXYZ\n АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ\n----------------------------------------\nТест принтера                         ОК`;
+  else if (type === 'preflight') front.textContent = `                  НРД\n▼ ${state.fullDate} ${utcStr} UTC_SU\nПредрейсовый тест (${ws.serial})\n----------------------------------------\nFirmware Test: OK | Дисплей:          OK\nПодсветка:     OK | Напр. батарейки:  OK\nНапр. питания: OK | СКЗИ готовность:  OK\nДанные ГНСС:   OK | Наличие бумаги:   OK\nПринтер:       OK | Отсутств.вскрытия:OK\n----------------------------------------\nВсе системы:                          OK ✔`;
+  else if (type === 'tech') front.textContent = `                  НРД\n▼ ${state.fullDate} ${utcStr} UTC_SU (Тех. данные)\n◉ ${d1.fullName}\nД ${ws.vin} | ${ws.plate}\n🏭 ООО "НОВЫЕ РЕШЕНИЯ ДРАЙВА" Drive Smart\n   S/N: ${ws.serial} | ПО: ${ws.fw}\n⚒ ИП "Сизенок И.Е." | w=${ws.wFactor} k=${ws.kFactor}\n  l=${ws.lWheel}мм | Шины: ${ws.tire} | >> ${state.speedLimit}км/ч\nОдометр ТС:                 ${endKm} км\n${nkmFooter}`;
+  else {
+    const logLines = state.dailyLog.slice(-6).map(item => `${symbols[item.mode]} ${item.start}   ${fDur(item.mins)}`).join('\n');
+    front.textContent =
+`                  НРД
+▼ ${state.fullDate} ${utcStr} UTC_SU
+---------24h▊▼ (Суточный отчет)---------
+◉ ${d1.fullName}
+◉▊${d1.cardNum} (до ${d1.expiry})
+Д ${ws.vin} (${ws.plate})
+------------1 (Слот водителя)-----------
+Начало смены:               ${startKm} км
+${logLines}
+Конец: ${endKm} км; Пробег: ${tripKm} км
+-------------------Σ--------------------
+◉ ${fDur(state.shiftDrive1)} (${tripKm} км) | ⚒ ${fDur(state.workSum1)}
+h ${fDur(state.restSum1)} | ☒ ${fDur(state.dur2)} | ? ${fDur(state.unknownSum1)}
+${nkmFooter}`;
+  }
+  renderManualBackForm();
+  explainReceiptFront();
+}
+
+function flipReceipt() {
+  vibrate();
+  const w = document.getElementById('receiptArea');
+  w.classList.toggle('flipped');
+  const isBack = w.classList.contains('flipped');
+  document.getElementById('flipBtn').textContent = isBack ? '🔄 Лицевая сторона чека' : '🔄 Перевернуть чек (Заполнить бланк вручную)';
+  if (isBack) {
+    setHint('✍️ Оборотная сторона чека (Ручной ввод деятельности)', 'Кликайте прямо по часам на сетке графика (00..24), чтобы начертить красную линию режимов, и при необходимости отредактируйте ФИО и госномер.', false, 'Бланк НРД');
+  } else {
+    explainReceiptFront();
+  }
+}
+function closeReceipt() { document.getElementById('receiptArea').style.display = 'none'; }
+
+function checkRTOAndDrivingRules() {
+  if (!state.driving) return;
+  if (getSlotType(1) !== 'driver') {
+    if (!state.noCardWarnShown) {
+      state.noCardWarnShown = true;
+      triggerAlert('1!◉ Управление', 'без соотв. карты', '04');
+    }
+  } else {
+    state.noCardWarnShown = false;
+  }
+
+  if (state.driveCont1 >= state.maxDriveTime && !state.limitWarnShown) {
+    state.limitWarnShown = true;
+    triggerAlert('◉‖ Лимит вождения', 'превышен!', 'RTO00');
+  } else if (state.driveCont1 >= state.maxDriveTime - 15 && state.driveCont1 < state.maxDriveTime && !state.preWarnShown) {
+    state.preWarnShown = true;
+    triggerAlert('◉‖ До перерыва', '15 минут.', 'RTO15');
+  }
+}
+
+function toggleDrive() {
+  wakeUp();
+  if (!state.ignition && !state.driving) {
+    state.ignition = true;
+    document.getElementById('ignBtnTxt').textContent = 'Зажигание: ВКЛ';
+  }
+  state.driving = !state.driving;
+  state.dur1 = 0;
+
+  if (state.driving) {
+    state.mode1 = 3;
+    if (getSlotType(2) === 'driver') state.mode2 = 2;
+    state.currentSpeed = 78;
+    if (state.isFerry) state.isFerry = false;
+    state.uiMode = 'main';
+    document.getElementById('driveBtnTxt').textContent = 'Остановить ТС';
+    document.getElementById('driveBtn').className = 'sim-btn red';
+    state.noCardWarnShown = false;
+    setHint('🚛 Движение начато (Режим ◉ Управление)', 'Тахограф автоматически переключил Водителя 1 в режим ◉ (Управление). Счетчик непрерывного вождения ведет отсчет до 04ч 30м.', false, 'В движении');
+    checkRTOAndDrivingRules();
+  } else {
+    state.mode1 = 1;
+    if (getSlotType(2) === 'driver') state.mode2 = 2;
+    state.currentSpeed = 0;
+    document.getElementById('driveBtnTxt').textContent = 'Начать движение';
+    document.getElementById('driveBtn').className = 'sim-btn green';
+    setHint('🛑 Автомобиль остановлен (Режим ⚒ Работа)', 'При остановке автоматически включился режим ⚒ (Прочие работы). Чтобы пошел зачет 45-минутного перерыва, нажмите кнопку «1» и выберите h (Отдых)!', false, 'Стоянка');
+  }
+  render();
+}
+
+function toggleIgnition() {
+  if (state.driving) { triggerAlert('! Остановите ТС', 'перед выкл. заж.', null, 2500); return; }
+  state.ignition = !state.ignition;
+  document.getElementById('ignBtnTxt').textContent = state.ignition ? 'Зажигание: ВКЛ' : 'Зажигание: ВЫКЛ';
+  if (!state.ignition) {
+    if (state.autoRest) { state.mode1 = 0; state.mode2 = 0; }
+    setHint('🔑 Зажигание выключено', 'По настройке «Автоматический отдых» тахограф перевел водителей в режим h (Отдых). Через 25 секунд бездействия включится режим энергосбережения.', false, 'Стоянка');
+    resetSleepTimer();
+  } else wakeUp(true);
+  render();
+}
+
+function triggerSpeeding() { wakeUp(); if (!state.driving) toggleDrive(); state.currentSpeed = state.speedLimit + 14; triggerAlert('>> Превышение', 'скорости', '07'); }
+function simulateMalfunction() { const ks = ['06', '08', '10', '16', '23', '50']; const c = ks[Math.floor(Math.random() * ks.length)]; triggerAlert(`!х Код ${c}:`, errorCodes[c], c); }
+function resetAllFaults() {
+  clearAlert(); Object.values(cardProfiles).forEach(c => { c.blocked = false; c.pinAttempts = 0; });
+  state.preWarnShown = false; state.limitWarnShown = false; state.noCardWarnShown = false;
+  state.driveCont1 = 0; state.breakSum1 = 0; state.dur1 = 0; state.uiMode = 'main'; beep(2100, 0.1);
+  setHint('✅ Все ошибки и счетчики нарушений сброшены', 'Тренажер возвращен в штатный рабочий режим.', false, 'Сброс');
+  render();
+}
+
+function shiftTime(delta) {
+  if (delta === 0) return;
+  wakeUp(false);
+  const oldClock = state.clock;
+  state.clock = ((state.clock + delta) % 1440 + 1440) % 1440;
+  // Если перешагнули полночь 00:00 вперед — обновляем суточную точку отсчета одометра
+  if (delta > 0 && state.clock < oldClock) {
+    state.startOdo = state.odo;
+    state.shiftDrive1 = 0; state.workSum1 = 0; state.restSum1 = 0;
+    state.dailyLog = [];
+  }
+  state.dur1 = Math.max(0, state.dur1 + delta);
+  state.dur2 = Math.max(0, state.dur2 + delta);
+
+  if (state.driving) {
+    state.driveCont1 = Math.max(0, state.driveCont1 + delta);
+    state.shiftDrive1 = Math.min(1440, Math.max(0, state.shiftDrive1 + delta));
+    state.week1Drive1 = Math.max(0, state.week1Drive1 + delta);
+    state.week2Drive1 = Math.max(0, state.week2Drive1 + delta);
+    const km = +(delta * 1.25).toFixed(1);
+    state.odo = Math.max(state.startOdo, state.odo + km);
+    if (delta > 0) appendDailyLog(3, delta);
+    if (state.driveCont1 < state.maxDriveTime - 15) state.preWarnShown = false;
+    if (state.driveCont1 < state.maxDriveTime) state.limitWarnShown = false;
+    checkRTOAndDrivingRules();
+  } else if (state.mode1 === 0 || state.mode1 === 2) {
+    state.breakSum1 = Math.max(0, state.breakSum1 + delta);
+    state.restSum1 = Math.min(1440, Math.max(0, state.restSum1 + delta));
+    if (delta > 0) appendDailyLog(state.mode1, delta);
+    if (state.breakSum1 >= 45 && delta > 0) {
+      state.driveCont1 = 0; state.preWarnShown = false; state.limitWarnShown = false;
+    }
+  } else {
+    state.workSum1 = Math.min(1440, Math.max(0, state.workSum1 + delta));
+    if (delta > 0) appendDailyLog(1, delta);
+  }
+  syncDialHand();
+  if (document.getElementById('receiptArea').style.display === 'flex') {
+    printReport(state.reportPending.type || 'card_daily');
+  }
+  render();
+}
+
+let isDraggingDial = false;
+const dialEl = document.getElementById('dial');
+function syncDialHand() {
+  const norm = ((state.clock % 1440) + 1440) % 1440;
+  document.getElementById('dialHand').style.transform = `translate(-50%, -100%) rotate(${(norm / 1440) * 2 * Math.PI}rad)`;
+  document.getElementById('dialTime').textContent = fClk(state.clock);
+}
+function handleDialMove(e) {
+  if (!isDraggingDial) return; e.preventDefault();
+  const rect = dialEl.getBoundingClientRect(), cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+  const px = e.touches ? e.touches[0].clientX : e.clientX, py = e.touches ? e.touches[0].clientY : e.clientY;
+  let angle = Math.atan2(py - cy, px - cx) + Math.PI / 2; if (angle < 0) angle += 2 * Math.PI;
+  let delta = Math.floor((angle / (2 * Math.PI)) * 1440) - (((state.clock % 1440) + 1440) % 1440);
+  if (delta < -720) delta += 1440;
+  if (delta > 720) delta -= 1440;
+  if (Math.abs(delta) >= 1) shiftTime(delta);
+}
+dialEl.addEventListener('mousedown', (e) => { isDraggingDial = true; handleDialMove(e); });
+window.addEventListener('mousemove', handleDialMove); window.addEventListener('mouseup', () => { isDraggingDial = false; });
+dialEl.addEventListener('touchstart', (e) => { isDraggingDial = true; handleDialMove(e); }, { passive: false });
+window.addEventListener('touchmove', handleDialMove, { passive: false }); window.addEventListener('touchend', () => { isDraggingDial = false; });
+
+setInterval(() => {
+  state.seconds = (state.seconds + 1) % 60;
+  if (state.seconds === 0) shiftTime(1);
+  if (state.driving) {
+    if (state.currentSpeed <= state.speedLimit) state.currentSpeed = 75 + Math.floor(Math.random() * 12);
+    const stepKm = state.currentSpeed / 3600;
+    state.odo += stepKm;
+  }
+  if (state.uiMode === 'main') render();
+}, 1000);
+
+syncDialHand(); resetSleepTimer(); updateScreenHint(); render();
+</script>
+</body>
+</html>
